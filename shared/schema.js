@@ -1,5 +1,4 @@
 import { pgTable, serial, varchar, text, boolean, timestamp, integer, decimal, date } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
 
 // Users table - agencies, portal owners, clients
 export const vantatrackUsers = pgTable("vantatrack_users", {
@@ -111,13 +110,3 @@ export const vantatrackUploadHistory = pgTable("vantatrack_upload_history", {
   errorDetails: text("error_details"),
   createdAt: timestamp("created_at").defaultNow(),
 });
-
-// Export types
-export type User = typeof vantatrackUsers.$inferSelect;
-export type InsertUser = typeof vantatrackUsers.$inferInsert;
-export type Client = typeof vantatrackClients.$inferSelect;
-export type InsertClient = typeof vantatrackClients.$inferInsert;
-export type Campaign = typeof vantatrackCampaigns.$inferSelect;
-export type GoogleCampaign = typeof vantatrackGoogleCampaigns.$inferSelect;
-export type FacebookCampaign = typeof vantatrackFacebookCampaigns.$inferSelect;
-export type UploadHistory = typeof vantatrackUploadHistory.$inferSelect;
