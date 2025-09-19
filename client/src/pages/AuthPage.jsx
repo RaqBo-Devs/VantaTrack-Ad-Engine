@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { Navigate } from 'wouter';
+import { Redirect } from 'wouter';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 
@@ -16,7 +16,7 @@ export default function AuthPage() {
 
   // Redirect if already logged in
   if (user) {
-    return <Navigate to="/" replace />;
+    return <Redirect to="/" />;
   }
 
   const handleSubmit = async (e) => {

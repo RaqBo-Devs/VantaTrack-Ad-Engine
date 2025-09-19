@@ -1,5 +1,5 @@
 import { useAuth } from "@/hooks/useAuth";
-import { Navigate, useLocation } from "wouter";
+import { Redirect, useLocation } from "wouter";
 
 export function ProtectedRoute({ children }) {
   const { user, isLoading } = useAuth();
@@ -17,7 +17,7 @@ export function ProtectedRoute({ children }) {
   }
 
   if (!user) {
-    return <Navigate to="/auth" replace />;
+    return <Redirect to="/auth" />;
   }
 
   return children;
