@@ -10,32 +10,9 @@ import DashboardPage from '@/pages/DashboardPage';
 import UploadPage from '@/pages/UploadPage';
 
 // Placeholder pages for complete navigation
-function CampaignsPage() {
-  return (
-    <div className="text-center py-12">
-      <h1 className="text-2xl font-bold text-gray-900 mb-4">Campaigns</h1>
-      <p className="text-gray-600">Multi-platform campaign management coming soon!</p>
-    </div>
-  );
-}
-
-function ClientsPage() {
-  return (
-    <div className="text-center py-12">
-      <h1 className="text-2xl font-bold text-gray-900 mb-4">Clients</h1>
-      <p className="text-gray-600">Client management portal coming soon!</p>
-    </div>
-  );
-}
-
-function AnalyticsPage() {
-  return (
-    <div className="text-center py-12">
-      <h1 className="text-2xl font-bold text-gray-900 mb-4">Analytics</h1>
-      <p className="text-gray-600">Advanced analytics dashboard coming soon!</p>
-    </div>
-  );
-}
+import CampaignsPage from '@/pages/CampaignsPage';
+import ClientsPage from '@/pages/ClientsPage';
+import AnalyticsPage from '@/pages/AnalyticsPage';
 
 function TemplatesPage() {
   return (
@@ -58,9 +35,15 @@ function App() {
               <Layout>
                 <Switch>
                   <Route path="/" component={DashboardPage} />
-                  <Route path="/campaigns" component={CampaignsPage} />
-                  <Route path="/clients" component={ClientsPage} />
-                  <Route path="/analytics" component={AnalyticsPage} />
+                  <Route path="/campaigns">
+                    <CampaignsPage />
+                  </Route>
+                  <Route path="/clients">
+                    <ClientsPage />
+                  </Route>
+                  <Route path="/analytics">
+                    <AnalyticsPage />
+                  </Route>
                   <Route path="/upload" component={UploadPage} />
                   <Route path="/templates" component={TemplatesPage} />
                   
