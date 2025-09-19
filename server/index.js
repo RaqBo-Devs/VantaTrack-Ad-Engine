@@ -10,6 +10,7 @@ import campaignsRouter from './routes/campaigns.js';
 import clientsRouter from './routes/clients.js';
 import uploadRouter from './routes/upload.js';
 import dashboardRouter from './routes/dashboard.js';
+import integrationsRouter from './routes/integrations.js';
 import { authLimiter, apiLimiter, uploadLimiter } from './middleware/rateLimiting.js';
 
 dotenv.config();
@@ -65,6 +66,7 @@ app.use('/api/dashboard', requireAuth, dashboardRouter);
 app.use('/api/campaigns', requireAuth, campaignsRouter);
 app.use('/api/clients', requireAuth, clientsRouter);
 app.use('/api/upload', requireAuth, uploadRouter);
+app.use('/api/integrations', requireAuth, integrationsRouter);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
