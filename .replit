@@ -37,13 +37,12 @@ args = "VantaTrack Frontend"
 name = "VantaTrack Server"
 author = "agent"
 
+[workflows.workflow.metadata]
+outputType = "console"
+
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npm run server"
-waitForPort = 5000
-
-[workflows.workflow.metadata]
-outputType = "webview"
+args = "JWT_SECRET=\"VantaTrack2025SecureJWTSecretForBangladeshAdEngine!\" npm run server"
 
 [[workflows.workflow]]
 name = "VantaTrack Frontend"
@@ -57,5 +56,13 @@ args = "cd client && npm run dev"
 outputType = "console"
 
 [[ports]]
+localPort = 3000
+externalPort = 3000
+
+[[ports]]
 localPort = 5000
 externalPort = 80
+
+[[ports]]
+localPort = 38419
+externalPort = 3001

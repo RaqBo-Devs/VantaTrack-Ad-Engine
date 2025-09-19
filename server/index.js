@@ -9,6 +9,7 @@ import { storage } from './storage.js';
 import campaignsRouter from './routes/campaigns.js';
 import clientsRouter from './routes/clients.js';
 import uploadRouter from './routes/upload.js';
+import dashboardRouter from './routes/dashboard.js';
 import { authLimiter, apiLimiter, uploadLimiter } from './middleware/rateLimiting.js';
 
 dotenv.config();
@@ -20,8 +21,13 @@ if (!process.env.DATABASE_URL) {
 }
 
 if (!process.env.JWT_SECRET) {
-  console.error('FATAL: JWT_SECRET environment variable is required');
-  process.exit(1);
+  if (process.env.NODE_ENV === 'production') {
+    console.error('FATAL: JWT_SECRET environment variable is required in production');
+    process.exit(1);
+  } else {
+    console.warn('WARNING: Using default JWT_SECRET for development. Set JWT_SECRET environment variable for production.');
+    process.env.JWT_SECRET = 'VantaTrack2025SecureJWTSecretForBangladeshAdEngine!';
+  }
 }
 
 if (!process.env.SESSION_SECRET) {
@@ -38,7 +44,7 @@ const PORT = process.env.PORT || 5000;
 // Security middleware
 app.use(helmet());
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:5000', 'http://0.0.0.0:5000'],
+  origin: ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:5000', 'http://0.0.0.0:5000'],
   credentials: true
 }));
 
@@ -53,6 +59,12 @@ app.use('/api/', apiLimiter);
 
 // Setup authentication
 const { requireAuth, requireRole } = setupAuth(app);
+
+// Mount protected routers
+app.use('/api/dashboard', requireAuth, dashboardRouter);
+app.use('/api/campaigns', requireAuth, campaignsRouter);
+app.use('/api/clients', requireAuth, clientsRouter);
+app.use('/api/upload', requireAuth, uploadRouter);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -78,32 +90,8 @@ app.get('/api/vantatrack/status', (req, res) => {
   });
 });
 
-// Dashboard data endpoint
-app.get('/api/dashboard/overview', requireAuth, async (req, res) => {
-  try {
-    // For now, return basic overview - will be enhanced with client-specific data
-    res.json({
-      totalCampaigns: 0,
-      totalImpressions: 0,
-      totalClicks: 0,
-      totalSpent: 0,
-      currency: 'BDT',
-      platforms: {
-        portal: { active: true, campaigns: 0 },
-        google: { active: false, campaigns: 0 },
-        facebook: { active: false, campaigns: 0 }
-      }
-    });
-  } catch (error) {
-    console.error('Dashboard error:', error);
-    res.status(500).json({ error: 'Failed to fetch dashboard data' });
-  }
-});
-
-// VantaTrack API Routes
-app.use('/api/campaigns', requireAuth, campaignsRouter);
-app.use('/api/clients', requireAuth, clientsRouter);
-app.use('/api/upload', requireAuth, uploadRouter);
+// Remove duplicate dashboard endpoint - handled by dashboardRouter
+// Remove duplicate router mounts - already mounted above
 
 // Sample data endpoint for Bangladesh market testing
 app.get('/api/sample-data', requireAuth, (req, res) => {

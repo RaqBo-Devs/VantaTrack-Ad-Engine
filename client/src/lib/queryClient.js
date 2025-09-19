@@ -24,6 +24,12 @@ export async function apiRequest(method, url, data = null) {
     },
   };
 
+  // Add JWT Authorization header if token exists
+  const token = localStorage.getItem('vantatrack_token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
   if (data) {
     config.body = JSON.stringify(data);
   }

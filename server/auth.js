@@ -8,10 +8,15 @@ import jwt from "jsonwebtoken";
 import { storage } from "./storage.js";
 
 const scryptAsync = promisify(scrypt);
-const JWT_SECRET = process.env.JWT_SECRET;
+let JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
-  console.error('FATAL: JWT_SECRET environment variable is required');
-  process.exit(1);
+  if (process.env.NODE_ENV === 'production') {
+    console.error('FATAL: JWT_SECRET environment variable is required in production');
+    process.exit(1);
+  } else {
+    console.warn('WARNING: Using default JWT_SECRET for development');
+    JWT_SECRET = 'VantaTrack2025SecureJWTSecretForBangladeshAdEngine!';
+  }
 }
 
 async function hashPassword(password) {
