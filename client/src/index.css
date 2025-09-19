@@ -1,0 +1,90 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+
+@layer base {
+  html {
+    font-family: 'Inter', 'Poppins', system-ui, sans-serif;
+  }
+  
+  body {
+    @apply bg-gray-50 text-gray-900 antialiased;
+    margin: 0;
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  /* VantaTrack Premium Button Styles */
+  .btn-primary {
+    @apply bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 shadow-md hover:shadow-lg focus:ring-4 focus:ring-primary-200 focus:outline-none;
+  }
+  
+  .btn-secondary {
+    @apply bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 shadow-md hover:shadow-lg focus:ring-4 focus:ring-emerald-200 focus:outline-none;
+  }
+  
+  .btn-outline {
+    @apply border-2 border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 focus:ring-4 focus:ring-primary-200 focus:outline-none;
+  }
+  
+  /* VantaTrack Card Styles */
+  .card-premium {
+    @apply bg-white rounded-xl shadow-premium border border-gray-100 hover:shadow-premium-lg transition-all duration-300;
+  }
+  
+  .card-metric {
+    @apply bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-md border border-gray-100 p-6 hover:shadow-lg transition-all duration-200;
+  }
+  
+  /* Form Styles */
+  .form-input {
+    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200 bg-white;
+  }
+  
+  .form-label {
+    @apply block text-sm font-medium text-gray-700 mb-2;
+  }
+  
+  /* Navigation Styles */
+  .nav-link {
+    @apply flex items-center px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-600 rounded-lg transition-all duration-200 font-medium;
+  }
+  
+  .nav-link-active {
+    @apply flex items-center px-4 py-3 bg-primary-100 text-primary-700 rounded-lg font-medium;
+  }
+}
+
+@layer utilities {
+  /* Custom utilities for VantaTrack */
+  .text-gradient-primary {
+    @apply bg-gradient-to-r from-primary-600 to-emerald-600 bg-clip-text text-transparent;
+  }
+  
+  .bg-gradient-vanta {
+    @apply bg-gradient-to-br from-primary-600 via-primary-700 to-emerald-600;
+  }
+  
+  .shadow-glow {
+    box-shadow: 0 0 20px rgba(30, 64, 175, 0.3);
+  }
+}
+
+/* Bangladesh-specific styles */
+.bengali-font {
+  font-family: 'Kalpurush', 'SolaimanLipi', 'Nikosh', sans-serif;
+}
+
+/* Mobile optimizations for 3G connections */
+@media (max-width: 768px) {
+  .card-premium {
+    @apply rounded-lg shadow-md;
+  }
+  
+  .btn-primary, .btn-secondary, .btn-outline {
+    @apply px-4 py-2 text-sm;
+  }
+}

@@ -1,0 +1,135 @@
+import { useState } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { Link, useLocation } from 'wouter';
+import { Button } from '@/components/ui/Button';
+
+const navigation = [
+  { name: 'Dashboard', href: '/', icon: '📊' },
+  { name: 'Campaigns', href: '/campaigns', icon: '🎯' },
+  { name: 'Clients', href: '/clients', icon: '👥' },
+  { name: 'Analytics', href: '/analytics', icon: '📈' },
+  { name: 'Upload Data', href: '/upload', icon: '📤' },
+  { name: 'Templates', href: '/templates', icon: '📋' },
+];
+
+export function Layout({ children }) {
+  const { user, logoutMutation } = useAuth();
+  const [location] = useLocation();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const handleLogout = () => {
+    logoutMutation.mutate();
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Mobile sidebar backdrop */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        >
+          <div className="absolute inset-0 bg-gray-600 opacity-75"></div>
+        </div>
+      )}
+
+      {/* Sidebar */}
+      <div className={`
+        fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0
+        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+      `}>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-gradient-vanta rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-lg">V</span>
+            </div>
+            <div>
+              <h1 className="text-lg font-bold text-gray-900">VantaTrack</h1>
+              <p className="text-xs text-gray-600">Ad Engine</p>
+            </div>
+          </div>
+          <button 
+            className="lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+          >
+            ✕
+          </button>
+        </div>
+
+        <nav className="mt-6 px-4">
+          <ul className="space-y-2">
+            {navigation.map((item) => {
+              const isActive = location === item.href;
+              return (
+                <li key={item.name}>
+                  <Link 
+                    href={item.href}
+                    className={isActive ? 'nav-link-active' : 'nav-link'}
+                  >
+                    <span className="mr-3 text-lg">{item.icon}</span>
+                    {item.name}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+
+        {/* User info and logout */}
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200">
+          <div className="flex items-center space-x-3 mb-4">
+            <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
+              <span className="text-primary-600 font-medium">
+                {user?.fullName?.[0]?.toUpperCase() || 'U'}
+              </span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-gray-900 truncate">
+                {user?.fullName || 'User'}
+              </p>
+              <p className="text-xs text-gray-500 truncate">
+                {user?.role?.replace('_', ' ')?.replace(/\b\w/g, l => l.toUpperCase())}
+              </p>
+            </div>
+          </div>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="w-full text-gray-600"
+            onClick={handleLogout}
+            loading={logoutMutation.isPending}
+          >
+            Sign out
+          </Button>
+        </div>
+      </div>
+
+      {/* Main content */}
+      <div className="lg:pl-64">
+        {/* Top bar */}
+        <header className="bg-white shadow-sm border-b border-gray-200">
+          <div className="flex items-center justify-between px-4 py-4 sm:px-6">
+            <button
+              className="lg:hidden p-2 rounded-md text-gray-600 hover:text-primary-600 hover:bg-gray-100"
+              onClick={() => setSidebarOpen(true)}
+            >
+              <span className="text-xl">☰</span>
+            </button>
+            
+            <div className="flex items-center space-x-4">
+              <div className="text-right">
+                <p className="text-sm font-medium text-gray-900">{user?.fullName}</p>
+                <p className="text-xs text-gray-500">{user?.email}</p>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Page content */}
+        <main className="p-4 sm:p-6">
+          {children}
+        </main>
+      </div>
+    </div>
+  );
+}
