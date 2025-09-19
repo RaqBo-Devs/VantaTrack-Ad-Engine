@@ -1,0 +1,81 @@
+Create VantaTrack Ad Engine - a complete professional ad serving platform for Bangladesh digital newspapers with enterprise-grade architecture, premium user interface, and flexible media buying integration supporting both API and manual data input:
+
+PRODUCT BRANDING:
+- Name: VantaTrack Ad Engine
+- Tagline: "Complete Media Management for Bangladesh Agencies"
+- Database name: vantatrack_ads
+- All UI elements branded with VantaTrack identity
+
+UI/UX DESIGN REQUIREMENTS:
+- Modern, professional design with sophisticated color palette: Deep blue (#1e40af) primary, emerald (#059669) accent
+- Premium typography using Inter or Poppins font family
+- Dashboard widgets with real-time data visualization across all media channels
+- Unified campaign management interface for Portal + Google + Facebook campaigns
+- File upload interface with drag-and-drop for CSV/Excel imports
+- Data source indicators showing API vs Manual data
+- Template download buttons for Google Ads and Facebook Ads CSV formats
+
+BACKEND (Node.js + Express + PostgreSQL):
+- Complete Express server with VantaTrack branded routes
+- PostgreSQL database with vantatrack_ table prefixes
+- JWT authentication system for agencies, portals, and clients
+- File upload system for CSV/Excel data import with validation
+- Comprehensive error handling and logging
+
+MEDIA BUYING INTEGRATION & MONITORING:
+- Dual approach: API integration + Manual upload system
+- Google Ads API v13+ integration for automated sync (optional)
+- Facebook Marketing API v18+ for Meta platform tracking (optional)
+- Excel/CSV upload system with templates for immediate use
+- Data validation and error reporting for uploaded files
+- Unified dashboard showing Portal + Google + Facebook performance
+- Data source indicators (API sync vs Manual upload vs Portal native)
+- Cross-platform budget tracking and ROI comparison
+- Automated client reporting combining all data sources
+
+MULTI-TENANT ACCESS CONTROL:
+- Client permissions: portal_access, google_access, facebook_access (booleans)
+- Dynamic UI based on client package type (Portal Only, Google Only, Facebook Only, combinations)
+- Role-based access control (Agency Admin, Client User, Client Admin)
+- Data isolation ensuring clients only see authorized information
+
+MANUAL DATA UPLOAD SYSTEM:
+- Drag-and-drop CSV/Excel file upload interface
+- Pre-built templates for Google Ads and Facebook Ads data
+- Data validation with line-by-line error reporting
+- Bulk upload capabilities for multiple campaigns
+- Data mapping interface for custom CSV formats
+- Duplicate detection and merge suggestions
+
+FRONTEND (React):
+- VantaTrack branded dashboard with multi-platform campaign overview
+- File upload interface with progress indicators and validation feedback
+- Template download section for CSV imports
+- Real-time analytics dashboard with cross-platform performance charts
+- Client portal showing performance across all media channels
+- Data source management interface (enable/disable API vs manual)
+
+DATABASE SCHEMA (PostgreSQL):
+- vantatrack_users (agencies, portal owners, clients with roles)
+- vantatrack_clients (with platform permissions: portal_access, google_access, facebook_access)
+- vantatrack_campaigns (portal campaigns with native tracking)
+- vantatrack_google_campaigns (Google Ads data from API or manual upload)
+- vantatrack_facebook_campaigns (Facebook/Instagram data from API or manual)
+- vantatrack_data_sources (tracking whether data is API or manually uploaded)
+- vantatrack_upload_history (audit trail of manual data uploads)
+- vantatrack_cross_platform_analytics (unified performance tracking)
+
+CLIENT MANAGEMENT:
+- Flexible data input options: API integration or manual upload
+- Client login portal showing unified performance across all media
+- Template downloads for easy manual data entry
+- Automated performance reports combining all data sources
+- Easy upgrade path from manual to API integration
+
+BANGLADESH MARKET OPTIMIZATION:
+- Bangladeshi Taka (৳) currency conversion for Google/Facebook USD data
+- Bengali language support for campaign names in uploads
+- Mobile-optimized file upload for 3G connections
+- Local business hours consideration in performance analysis
+
+Create a flexible media buying platform that works immediately with manual uploads while supporting API integration for advanced users. Include comprehensive CSV templates and validation to ensure data quality regardless of input method.
