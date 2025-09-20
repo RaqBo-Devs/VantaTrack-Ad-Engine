@@ -8,9 +8,11 @@ import {
   vantatrackCampaigns,
   vantatrackGoogleCampaigns,
   vantatrackFacebookCampaigns,
-  vantatrackUploadHistory
+  vantatrackUploadHistory,
+  vantatrackInvites,
+  vantatrackUserLoginActivity
 } from '../shared/schema.js';
-import { eq, and, desc } from 'drizzle-orm';
+import { eq, and, desc, isNull, gt, sql } from 'drizzle-orm';
 
 const PostgresSessionStore = connectPg(session);
 
@@ -200,6 +202,133 @@ export class DatabaseStorage {
     });
 
     return metrics;
+  }
+
+  // Admin invite system methods
+  async getClientsWithInviteStatus(agencyId) {
+    // Subquery to get the latest invite per client
+    const latestInviteSubquery = db
+      .select({
+        clientId: vantatrackInvites.clientId,
+        latestInviteId: sql`MAX(${vantatrackInvites.id})`.as('latest_invite_id')
+      })
+      .from(vantatrackInvites)
+      .groupBy(vantatrackInvites.clientId)
+      .as('latest_invites');
+
+    // Get clients with their latest invite information
+    const clients = await db.select({
+      id: vantatrackClients.id,
+      clientName: vantatrackClients.clientName,
+      agencyId: vantatrackClients.agencyId,
+      contactEmail: vantatrackClients.contactEmail,
+      phone: vantatrackClients.phone,
+      portalAccess: vantatrackClients.portalAccess,
+      googleAccess: vantatrackClients.googleAccess,
+      facebookAccess: vantatrackClients.facebookAccess,
+      monthlyPackageBdt: vantatrackClients.monthlyPackageBdt,
+      contractStartDate: vantatrackClients.contractStartDate,
+      notes: vantatrackClients.notes,
+      status: vantatrackClients.status,
+      createdAt: vantatrackClients.createdAt,
+      // Latest invite information
+      inviteId: vantatrackInvites.id,
+      inviteExpiry: vantatrackInvites.expiresAt,
+      inviteUsed: vantatrackInvites.usedAt
+    })
+      .from(vantatrackClients)
+      .leftJoin(latestInviteSubquery, eq(vantatrackClients.id, latestInviteSubquery.clientId))
+      .leftJoin(vantatrackInvites, eq(latestInviteSubquery.latestInviteId, vantatrackInvites.id))
+      .where(eq(vantatrackClients.agencyId, agencyId))
+      .orderBy(desc(vantatrackClients.createdAt));
+
+    return clients;
+  }
+
+  async createInvite(inviteData) {
+    const [newInvite] = await db.insert(vantatrackInvites).values(inviteData).returning();
+    return newInvite;
+  }
+
+  async regenerateInvite(clientId, inviteData) {
+    // First, mark any existing invites as used
+    await db.update(vantatrackInvites)
+      .set({ usedAt: new Date() })
+      .where(and(eq(vantatrackInvites.clientId, clientId), isNull(vantatrackInvites.usedAt)));
+
+    // Create new invite
+    const [newInvite] = await db.insert(vantatrackInvites)
+      .values({
+        ...inviteData,
+        clientId
+      })
+      .returning();
+
+    return newInvite;
+  }
+
+  async getPendingInvites(agencyId) {
+    const invites = await db.select({
+      id: vantatrackInvites.id,
+      clientId: vantatrackInvites.clientId,
+      invitedEmail: vantatrackInvites.invitedEmail,
+      role: vantatrackInvites.role,
+      expiresAt: vantatrackInvites.expiresAt,
+      createdAt: vantatrackInvites.createdAt,
+      clientName: vantatrackClients.clientName,
+      packageAmountBdt: vantatrackInvites.packageAmountBdt
+    })
+      .from(vantatrackInvites)
+      .innerJoin(vantatrackClients, eq(vantatrackInvites.clientId, vantatrackClients.id))
+      .where(and(
+        eq(vantatrackClients.agencyId, agencyId),
+        isNull(vantatrackInvites.usedAt),
+        gt(vantatrackInvites.expiresAt, new Date())
+      ))
+      .orderBy(desc(vantatrackInvites.createdAt));
+
+    return invites;
+  }
+
+  async getInviteByCodeHash(codeHash) {
+    const [invite] = await db.select({
+      id: vantatrackInvites.id,
+      clientId: vantatrackInvites.clientId,
+      invitedEmail: vantatrackInvites.invitedEmail,
+      role: vantatrackInvites.role,
+      portalAccess: vantatrackInvites.portalAccess,
+      googleAccess: vantatrackInvites.googleAccess,
+      facebookAccess: vantatrackInvites.facebookAccess,
+      expiresAt: vantatrackInvites.expiresAt,
+      usedAt: vantatrackInvites.usedAt,
+      clientName: vantatrackClients.clientName,
+      agencyId: vantatrackClients.agencyId
+    })
+      .from(vantatrackInvites)
+      .innerJoin(vantatrackClients, eq(vantatrackInvites.clientId, vantatrackClients.id))
+      .where(eq(vantatrackInvites.codeHash, codeHash));
+
+    return invite;
+  }
+
+  async markInviteAsUsed(inviteId) {
+    const [updated] = await db.update(vantatrackInvites)
+      .set({ usedAt: new Date() })
+      .where(eq(vantatrackInvites.id, inviteId))
+      .returning();
+    return updated;
+  }
+
+  async logUserActivity(userId, ipAddress, userAgent, loginMethod = 'password') {
+    const [activity] = await db.insert(vantatrackUserLoginActivity)
+      .values({
+        userId,
+        ipAddress,
+        userAgent,
+        loginMethod
+      })
+      .returning();
+    return activity;
   }
 }
 
