@@ -31,32 +31,40 @@ export default function DashboardPage() {
     }).format(amount);
   };
 
+  const formatCurrencyUSD = (amount) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+    }).format(amount);
+  };
+
   const metrics = [
     {
       title: 'Total Campaigns',
-      value: dashboardData?.totalCampaigns || 0,
+      value: dashboardData?.metrics?.totalCampaigns || 0,
       subtitle: 'Active campaigns',
       icon: '🎯',
       trend: { direction: 'up', value: '+12%' }
     },
     {
       title: 'Total Impressions',
-      value: (dashboardData?.totalImpressions || 0).toLocaleString(),
+      value: (dashboardData?.metrics?.totalImpressions || 0).toLocaleString(),
       subtitle: 'This month',
       icon: '👁️',
       trend: { direction: 'up', value: '+8.2%' }
     },
     {
       title: 'Total Clicks',
-      value: (dashboardData?.totalClicks || 0).toLocaleString(),
+      value: (dashboardData?.metrics?.totalClicks || 0).toLocaleString(),
       subtitle: 'This month',
       icon: '👆',
       trend: { direction: 'up', value: '+15.3%' }
     },
     {
       title: 'Total Spent',
-      value: formatCurrency(dashboardData?.totalSpent || 0),
-      subtitle: 'This month',
+      value: formatCurrency(dashboardData?.metrics?.totalSpent || 0),
+      subtitle: dashboardData?.platforms ? `Portal: ${formatCurrency(dashboardData.platforms.portal?.spent || 0)} | Global: ${formatCurrencyUSD((dashboardData.platforms.google?.spent || 0) + (dashboardData.platforms.facebook?.spent || 0))}` : 'This month',
       icon: '💰',
       trend: { direction: 'up', value: '+5.1%' }
     },
@@ -157,26 +165,28 @@ export default function DashboardPage() {
       {/* Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Campaigns</h3>
-          {sampleData?.campaigns ? (
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Top Campaigns</h3>
+          {dashboardData?.topCampaigns ? (
             <div className="space-y-4">
-              {sampleData.campaigns.portal?.slice(0, 3).map((campaign, index) => (
+              {dashboardData.topCampaigns.slice(0, 3).map((campaign, index) => (
                 <div key={index} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
                   <div>
-                    <p className="font-medium text-gray-900">{campaign.campaignName}</p>
-                    <p className="text-sm text-gray-500">{campaign.campaignType} • Portal</p>
+                    <p className="font-medium text-gray-900">{campaign.name}</p>
+                    <p className="text-sm text-gray-500">{campaign.platform} • ROI: {campaign.roi}%</p>
                   </div>
                   <div className="text-right">
                     <p className="text-sm font-medium text-gray-900">
-                      {formatCurrency(campaign.costBdt)}
+                      {campaign.platform === 'Google' || campaign.platform === 'Facebook' 
+                        ? formatCurrencyUSD(campaign.spent) 
+                        : formatCurrency(campaign.spent)}
                     </p>
-                    <p className="text-xs text-emerald-600">{campaign.status}</p>
+                    <p className="text-xs text-emerald-600">{campaign.clicks?.toLocaleString()} clicks</p>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-gray-500 text-center py-8">No recent campaigns</p>
+            <p className="text-gray-500 text-center py-8">No campaigns available</p>
           )}
         </Card>
 

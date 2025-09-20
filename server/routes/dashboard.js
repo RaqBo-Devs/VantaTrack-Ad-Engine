@@ -14,7 +14,7 @@ router.get('/overview', async (req, res) => {
       metrics: {
         totalCampaigns: 12,
         activeCampaigns: 8,
-        totalSpent: 245000, // in BDT
+        totalSpent: 245000, // Combined: Portal BDT + Google/Facebook USD converted to BDT
         monthlySpent: 85000, // in BDT
         totalImpressions: 1250000,
         totalClicks: 42500,
@@ -31,14 +31,14 @@ router.get('/overview', async (req, res) => {
         },
         google: {
           campaigns: 3,
-          spent: 89250,
+          spent: 810, // USD amount
           impressions: 520000,
           clicks: 15600,
           ctr: 3.0
         },
         facebook: {
           campaigns: 5,
-          spent: 82250,
+          spent: 750, // USD amount
           impressions: 730000,
           clicks: 21950,
           ctr: 3.0
@@ -77,7 +77,7 @@ router.get('/overview', async (req, res) => {
         {
           name: 'Search Ads - Bangladesh News',
           platform: 'Google',
-          spent: 38500,
+          spent: 350, // USD amount
           impressions: 98000,
           clicks: 2940,
           conversions: 176,
@@ -86,7 +86,7 @@ router.get('/overview', async (req, res) => {
         {
           name: 'Facebook Brand Awareness',
           platform: 'Facebook',
-          spent: 28750,
+          spent: 260, // USD amount
           impressions: 185000,
           clicks: 5550,
           conversions: 142,
