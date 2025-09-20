@@ -14,6 +14,7 @@ import CampaignsPage from '@/pages/CampaignsPage';
 import ClientsPage from '@/pages/ClientsPage';
 import AnalyticsPage from '@/pages/AnalyticsPage';
 import AdminPage from '@/pages/AdminPage';
+import { InvitePage } from '@/pages/InvitePage';
 
 function TemplatesPage() {
   return (
@@ -31,6 +32,7 @@ function App() {
         <Router>
           <Switch>
             <Route path="/auth" component={AuthPage} />
+            <Route path="/invite/:code" component={InvitePage} />
             
             <ProtectedRoute>
               <Layout>
