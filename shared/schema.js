@@ -8,6 +8,7 @@ export const vantatrackUsers = pgTable("vantatrack_users", {
   fullName: varchar("full_name", { length: 255 }).notNull(),
   role: varchar("role", { length: 50 }).notNull(), // agency_admin, client_user, client_admin, portal_owner
   agencyId: integer("agency_id"),
+  clientId: integer("client_id"), // For client users - links to vantatrackClients
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
   isActive: boolean("is_active").default(true),
@@ -24,6 +25,10 @@ export const vantatrackClients = pgTable("vantatrack_clients", {
   contactEmail: varchar("contact_email", { length: 255 }).notNull(),
   phone: varchar("phone", { length: 50 }),
   address: text("address"),
+  monthlyPackageBdt: decimal("monthly_package_bdt", { precision: 15, scale: 2 }), // Package amount in BDT
+  contractStartDate: date("contract_start_date"), // Contract start date
+  notes: text("notes"), // Admin notes about the client
+  status: varchar("status", { length: 50 }).default("invited"), // invited, active, inactive
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
   isActive: boolean("is_active").default(true),
@@ -108,5 +113,34 @@ export const vantatrackUploadHistory = pgTable("vantatrack_upload_history", {
   recordsFailed: integer("records_failed").default(0),
   uploadStatus: varchar("upload_status", { length: 50 }).default("processing"),
   errorDetails: text("error_details"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Invites table for invite-only client onboarding
+export const vantatrackInvites = pgTable("vantatrack_invites", {
+  id: serial("id").primaryKey(),
+  codeHash: varchar("code_hash", { length: 255 }).notNull().unique(), // SHA-256 hash of invite code
+  clientId: integer("client_id").notNull(), // References vantatrackClients
+  invitedEmail: varchar("invited_email", { length: 255 }).notNull(),
+  role: varchar("role", { length: 50 }).default("client_admin"), // Role for invited user
+  portalAccess: boolean("portal_access").default(false),
+  googleAccess: boolean("google_access").default(false),
+  facebookAccess: boolean("facebook_access").default(false),
+  packageAmountBdt: decimal("package_amount_bdt", { precision: 15, scale: 2 }),
+  contractStartDate: date("contract_start_date"),
+  notes: text("notes"),
+  expiresAt: timestamp("expires_at").notNull(), // 7 days from creation
+  usedAt: timestamp("used_at"), // When invite was activated
+  createdByUserId: integer("created_by_user_id").notNull(), // Admin who created invite
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// User login activity tracking
+export const vantatrackUserLoginActivity = pgTable("vantatrack_user_login_activity", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  ipAddress: varchar("ip_address", { length: 45 }), // IPv4 or IPv6
+  userAgent: text("user_agent"),
+  loginMethod: varchar("login_method", { length: 50 }).default("password"), // password, jwt, etc
   createdAt: timestamp("created_at").defaultNow(),
 });
