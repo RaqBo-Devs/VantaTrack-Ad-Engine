@@ -123,7 +123,7 @@ export function Layout({ children }) {
       <div className="lg:pl-64">
         {/* Top bar */}
         <header className="bg-white shadow-sm border-b border-gray-200">
-          <div className="flex items-center justify-between px-4 py-4 sm:px-6">
+          <div className="flex items-center justify-between px-6 py-4">
             <button
               className="lg:hidden p-2 rounded-md text-gray-600 hover:text-primary-600 hover:bg-gray-100"
               onClick={() => setSidebarOpen(true)}
@@ -140,8 +140,8 @@ export function Layout({ children }) {
           </div>
         </header>
 
-        {/* Page content */}
-        <main className="p-4 sm:p-6">
+        {/* Page content - aligned to match sidebar navigation start */}
+        <main className="px-6 py-6">
           {children}
         </main>
       </div>
