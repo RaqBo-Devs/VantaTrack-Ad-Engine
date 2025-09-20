@@ -52,17 +52,7 @@ export function Layout({ children }) {
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-          <div className="flex flex-col items-center space-y-3">
-            <div className="w-16 h-16 rounded-lg flex items-center justify-center overflow-hidden">
-              <img 
-                src="/images/vantatrack-logo.svg" 
-                alt="VantaTrack Logo"
-                className="w-full h-full object-contain"
-              />
-            </div>
-            <p className="text-sm text-gray-600 font-medium">Ad Engine</p>
-          </div>
+        <div className="flex items-center justify-end px-6 py-4 border-b border-gray-200">
           <button 
             className="lg:hidden"
             onClick={() => setSidebarOpen(false)}
@@ -125,12 +115,28 @@ export function Layout({ children }) {
         {/* Top bar */}
         <header className="bg-white shadow-sm border-b border-gray-200">
           <div className="flex items-center justify-between px-4 py-4">
-            <button
-              className="lg:hidden p-2 rounded-md text-gray-600 hover:text-primary-600 hover:bg-gray-100"
-              onClick={() => setSidebarOpen(true)}
-            >
-              <span className="text-xl">☰</span>
-            </button>
+            <div className="flex items-center space-x-4">
+              <button
+                className="lg:hidden p-2 rounded-md text-gray-600 hover:text-primary-600 hover:bg-gray-100"
+                onClick={() => setSidebarOpen(true)}
+              >
+                <span className="text-xl">☰</span>
+              </button>
+              
+              {/* Logo and branding in main header */}
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center overflow-hidden">
+                  <img 
+                    src="/images/vantatrack-logo.svg" 
+                    alt="VantaTrack Logo"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-900">Ad Engine</p>
+                </div>
+              </div>
+            </div>
             
             <div className="flex items-center space-x-4">
               <div className="text-right">
