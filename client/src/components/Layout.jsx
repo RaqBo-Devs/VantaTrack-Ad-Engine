@@ -125,7 +125,7 @@ export function Layout({ children }) {
               
               {/* Logo in main header */}
               <div className="flex items-center space-x-3">
-                <div className="w-24 h-24 rounded-lg flex items-center justify-center overflow-hidden">
+                <div className="w-48 h-48 rounded-lg flex items-center justify-center overflow-hidden">
                   <img 
                     src="/images/vantatrack-logo-cropped.svg" 
                     alt="VantaTrack Logo"

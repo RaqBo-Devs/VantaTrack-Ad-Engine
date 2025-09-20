@@ -183,7 +183,7 @@ export default function DashboardPage() {
         <Card>
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
           <div className="space-y-3">
-            <Link href="/placements">
+            <Link href="/placements" className="block">
               <Button variant="outline" className="w-full justify-start">
                 📺 Create New Placement
               </Button>
