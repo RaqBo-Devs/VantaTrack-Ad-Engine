@@ -279,7 +279,7 @@ router.get('/placements', requireAdmin, async (req, res) => {
         position: vantatrackPlacements.position,
         status: vantatrackPlacements.status,
         siteName: vantatrackSites.siteName,
-        domain: vantatrackSites.domain,
+        domain: vantatrackPublishers.domain,
         publisherName: vantatrackPublishers.publisherName,
         createdAt: vantatrackPlacements.createdAt
       })
@@ -347,7 +347,7 @@ router.post('/placements', requireAdmin, async (req, res) => {
     let site = await db
       .select()
       .from(vantatrackSites)
-      .where(eq(vantatrackSites.domain, domain))
+      .where(eq(vantatrackSites.siteName, siteName))
       .limit(1);
 
     if (!site.length) {
@@ -357,7 +357,6 @@ router.post('/placements', requireAdmin, async (req, res) => {
         .values({
           publisherId: publisher[0]?.id || publisher.id,
           siteName,
-          domain,
           siteUrl: siteUrl || `https://www.${domain}`,
           status: 'active',
           createdAt: new Date(),
