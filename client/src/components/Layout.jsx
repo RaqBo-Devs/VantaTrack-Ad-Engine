@@ -49,7 +49,7 @@ export function Layout({ children }) {
 
       {/* Full-width header at the top */}
       <header className="bg-white shadow-sm border-b border-gray-200 h-16 w-full">
-        <div className="flex items-center justify-between px-4 h-full">
+        <div className="flex items-center justify-between pl-6 pr-4 h-full">
           <div className="flex items-center space-x-4">
             <button
               className="lg:hidden p-2 rounded-md text-gray-600 hover:text-primary-600 hover:bg-gray-100"
@@ -68,7 +68,7 @@ export function Layout({ children }) {
                 />
               </div>
               <div>
-                <p className="text-lg font-medium text-gray-900">Ad Engine</p>
+                <p className="text-xl font-medium text-gray-900">Ad Engine</p>
               </div>
             </div>
           </div>
