@@ -122,13 +122,16 @@ export function Layout({ children }) {
               </button>
               
               {/* Logo in main header */}
-              <div className="flex items-center">
+              <div className="flex items-center space-x-3">
                 <div className="w-32 h-32 rounded-lg flex items-center justify-center overflow-hidden">
                   <img 
                     src="/images/vantatrack-logo-cropped.svg" 
                     alt="VantaTrack Logo"
                     className="w-full h-full object-contain"
                   />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-900">Ad Engine</p>
                 </div>
               </div>
             </div>
