@@ -62,7 +62,7 @@ export function Layout({ children }) {
             <div className="flex items-center space-x-3">
               <div className="w-64 h-64 rounded-lg flex items-center justify-center overflow-hidden">
                 <img 
-                  src="/images/vantatrack-logo-cropped.svg" 
+                  src="/images/vantatrack-logo.svg" 
                   alt="VantaTrack Logo"
                   className="w-full h-full object-contain"
                 />
