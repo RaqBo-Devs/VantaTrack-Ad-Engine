@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getQueryFn } from '@/lib/queryClient';
 import { Card, MetricCard } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { Link } from 'wouter';
 
 export default function DashboardPage() {
   const { data: dashboardData, isLoading } = useQuery({
@@ -182,6 +183,11 @@ export default function DashboardPage() {
         <Card>
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
           <div className="space-y-3">
+            <Link href="/placements">
+              <Button variant="outline" className="w-full justify-start">
+                📺 Create New Placement
+              </Button>
+            </Link>
             <Button variant="outline" className="w-full justify-start">
               📤 Upload Google Ads Data
             </Button>
