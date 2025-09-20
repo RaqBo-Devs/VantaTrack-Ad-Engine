@@ -2,6 +2,13 @@ import express from 'express';
 import { storage } from '../storage.js';
 import { hashPassword } from '../auth.js';
 import { randomBytes, createHash } from 'crypto';
+import { db } from '../storage.js';
+import { 
+  vantatrackPlacements, 
+  vantatrackSites, 
+  vantatrackPublishers 
+} from '../../shared/schema.js';
+import { eq, desc } from 'drizzle-orm';
 
 const router = express.Router();
 
@@ -255,6 +262,199 @@ router.get('/invites', requireAdmin, async (req, res) => {
   } catch (error) {
     console.error('Error fetching pending invites:', error);
     res.status(500).json({ error: 'Failed to fetch pending invites' });
+  }
+});
+
+// ==== AD PLACEMENT MANAGEMENT ====
+
+// GET /admin/placements - List all placements
+router.get('/placements', requireAdmin, async (req, res) => {
+  try {
+    const placements = await db
+      .select({
+        id: vantatrackPlacements.id,
+        placementKey: vantatrackPlacements.placementKey,
+        placementName: vantatrackPlacements.placementName,
+        adSize: vantatrackPlacements.adSize,
+        position: vantatrackPlacements.position,
+        status: vantatrackPlacements.status,
+        siteName: vantatrackSites.siteName,
+        domain: vantatrackSites.domain,
+        publisherName: vantatrackPublishers.publisherName,
+        createdAt: vantatrackPlacements.createdAt
+      })
+      .from(vantatrackPlacements)
+      .leftJoin(vantatrackSites, eq(vantatrackPlacements.siteId, vantatrackSites.id))
+      .leftJoin(vantatrackPublishers, eq(vantatrackSites.publisherId, vantatrackPublishers.id))
+      .orderBy(desc(vantatrackPlacements.createdAt));
+
+    res.json({
+      placements,
+      totalPlacements: placements.length
+    });
+  } catch (error) {
+    console.error('Error fetching placements:', error);
+    res.status(500).json({ error: 'Failed to fetch placements' });
+  }
+});
+
+// POST /admin/placements - Create new placement
+router.post('/placements', requireAdmin, async (req, res) => {
+  try {
+    const {
+      publisherName,
+      domain,
+      siteName,
+      siteUrl,
+      placementName,
+      adSize,
+      position
+    } = req.body;
+
+    // Validation
+    if (!publisherName || !domain || !siteName || !placementName) {
+      return res.status(400).json({ 
+        error: 'Publisher name, domain, site name, and placement name are required' 
+      });
+    }
+
+    // Check if publisher exists, create if not
+    let publisher = await db
+      .select()
+      .from(vantatrackPublishers)
+      .where(eq(vantatrackPublishers.domain, domain))
+      .limit(1);
+
+    if (!publisher.length) {
+      // Create new publisher
+      const newPublisher = await db
+        .insert(vantatrackPublishers)
+        .values({
+          publisherName,
+          domain,
+          contactEmail: `admin@${domain}`,
+          status: 'active',
+          createdAt: new Date(),
+          updatedAt: new Date()
+        })
+        .returning();
+      publisher = newPublisher;
+    } else {
+      publisher = publisher[0];
+    }
+
+    // Check if site exists, create if not
+    let site = await db
+      .select()
+      .from(vantatrackSites)
+      .where(eq(vantatrackSites.domain, domain))
+      .limit(1);
+
+    if (!site.length) {
+      // Create new site
+      const newSite = await db
+        .insert(vantatrackSites)
+        .values({
+          publisherId: publisher[0]?.id || publisher.id,
+          siteName,
+          domain,
+          siteUrl: siteUrl || `https://www.${domain}`,
+          status: 'active',
+          createdAt: new Date(),
+          updatedAt: new Date()
+        })
+        .returning();
+      site = newSite;
+    } else {
+      site = site[0];
+    }
+
+    // Generate placement key
+    const placementKey = `${domain.replace(/\./g, '-')}-${position}-${adSize}`;
+
+    // Create placement
+    const placement = await db
+      .insert(vantatrackPlacements)
+      .values({
+        siteId: site[0]?.id || site.id,
+        placementKey,
+        placementName,
+        adSize,
+        position,
+        status: 'active',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })
+      .returning();
+
+    res.status(201).json({
+      message: 'Placement created successfully',
+      placement: placement[0],
+      publisherName,
+      siteName,
+      domain,
+      placementKey
+    });
+
+  } catch (error) {
+    console.error('Error creating placement:', error);
+    res.status(500).json({ error: 'Failed to create placement' });
+  }
+});
+
+// PUT /admin/placements/:id - Update placement
+router.put('/placements/:id', requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { placementName, status } = req.body;
+
+    const updatedPlacement = await db
+      .update(vantatrackPlacements)
+      .set({
+        placementName,
+        status,
+        updatedAt: new Date()
+      })
+      .where(eq(vantatrackPlacements.id, parseInt(id)))
+      .returning();
+
+    if (!updatedPlacement.length) {
+      return res.status(404).json({ error: 'Placement not found' });
+    }
+
+    res.json({
+      message: 'Placement updated successfully',
+      placement: updatedPlacement[0]
+    });
+
+  } catch (error) {
+    console.error('Error updating placement:', error);
+    res.status(500).json({ error: 'Failed to update placement' });
+  }
+});
+
+// DELETE /admin/placements/:id - Delete placement
+router.delete('/placements/:id', requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const deletedPlacement = await db
+      .delete(vantatrackPlacements)
+      .where(eq(vantatrackPlacements.id, parseInt(id)))
+      .returning();
+
+    if (!deletedPlacement.length) {
+      return res.status(404).json({ error: 'Placement not found' });
+    }
+
+    res.json({
+      message: 'Placement deleted successfully',
+      placement: deletedPlacement[0]
+    });
+
+  } catch (error) {
+    console.error('Error deleting placement:', error);
+    res.status(500).json({ error: 'Failed to delete placement' });
   }
 });
 
