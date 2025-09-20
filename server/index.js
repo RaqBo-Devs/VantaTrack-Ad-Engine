@@ -12,6 +12,7 @@ import uploadRouter from './routes/upload.js';
 import dashboardRouter from './routes/dashboard.js';
 import integrationsRouter from './routes/integrations.js';
 import adminRouter from './routes/admin.js';
+import inviteRouter from './routes/invite.js';
 import { authLimiter, apiLimiter, uploadLimiter } from './middleware/rateLimiting.js';
 
 dotenv.config();
@@ -69,6 +70,7 @@ app.use('/api/clients', requireAuth, clientsRouter);
 app.use('/api/upload', requireAuth, uploadRouter);
 app.use('/api/integrations', requireAuth, integrationsRouter);
 app.use('/api/admin', requireAuth, adminRouter);
+app.use('/api/invite', inviteRouter);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
