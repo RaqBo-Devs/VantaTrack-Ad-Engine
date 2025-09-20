@@ -13,6 +13,7 @@ import UploadPage from '@/pages/UploadPage';
 import CampaignsPage from '@/pages/CampaignsPage';
 import ClientsPage from '@/pages/ClientsPage';
 import AnalyticsPage from '@/pages/AnalyticsPage';
+import AdminPage from '@/pages/AdminPage';
 
 function TemplatesPage() {
   return (
@@ -46,6 +47,7 @@ function App() {
                   </Route>
                   <Route path="/upload" component={UploadPage} />
                   <Route path="/templates" component={TemplatesPage} />
+                  <Route path="/admin" component={AdminPage} />
                   
                   <Route>
                     <div className="text-center py-12">

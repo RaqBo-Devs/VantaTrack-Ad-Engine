@@ -3,14 +3,27 @@ import { useAuth } from '@/hooks/useAuth';
 import { Link, useLocation } from 'wouter';
 import { Button } from '@/components/ui/Button';
 
-const navigation = [
-  { name: 'Dashboard', href: '/', icon: '📊' },
-  { name: 'Campaigns', href: '/campaigns', icon: '🎯' },
-  { name: 'Clients', href: '/clients', icon: '👥' },
-  { name: 'Analytics', href: '/analytics', icon: '📈' },
-  { name: 'Upload Data', href: '/upload', icon: '📤' },
-  { name: 'Templates', href: '/templates', icon: '📋' },
-];
+const getNavigation = (user) => {
+  const baseNavigation = [
+    { name: 'Dashboard', href: '/', icon: '📊' },
+    { name: 'Campaigns', href: '/campaigns', icon: '🎯' },
+    { name: 'Clients', href: '/clients', icon: '👥' },
+    { name: 'Analytics', href: '/analytics', icon: '📈' },
+    { name: 'Upload Data', href: '/upload', icon: '📤' },
+    { name: 'Templates', href: '/templates', icon: '📋' },
+  ];
+
+  // Add admin navigation for agency_admin users
+  if (user?.role === 'agency_admin') {
+    baseNavigation.push({
+      name: 'Admin Panel',
+      href: '/admin',
+      icon: '⚙️'
+    });
+  }
+
+  return baseNavigation;
+};
 
 export function Layout({ children }) {
   const { user, logoutMutation } = useAuth();
@@ -58,7 +71,7 @@ export function Layout({ children }) {
 
         <nav className="mt-6 px-4">
           <ul className="space-y-2">
-            {navigation.map((item) => {
+            {getNavigation(user).map((item) => {
               const isActive = location === item.href;
               return (
                 <li key={item.name}>
