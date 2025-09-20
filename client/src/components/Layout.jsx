@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { Link, useLocation } from 'wouter';
+import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/Button';
 
 const getNavigation = (user) => {
@@ -69,13 +69,10 @@ export function Layout({ children }) {
               const isActive = location === item.href;
               return (
                 <li key={item.name}>
-                  <Link 
-                    href={item.href}
-                    className={isActive ? 'nav-link-active' : 'nav-link'}
-                  >
+                  <div className={isActive ? 'nav-link-active' : 'nav-link'}>
                     <span className="mr-3 text-lg">{item.icon}</span>
                     {item.name}
-                  </Link>
+                  </div>
                 </li>
               );
             })}
@@ -126,7 +123,7 @@ export function Layout({ children }) {
               
               {/* Logo and branding in main header */}
               <div className="flex items-center space-x-3">
-                <div className="w-60 h-60 rounded-lg flex items-center justify-center overflow-hidden">
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center overflow-hidden">
                   <img 
                     src="/images/vantatrack-logo-cropped.svg" 
                     alt="VantaTrack Logo"
@@ -134,7 +131,8 @@ export function Layout({ children }) {
                   />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-900">Ad Engine</p>
+                  <h1 className="text-xl font-bold text-primary-600">VantaTrack</h1>
+                  <p className="text-sm text-gray-600">Ad Engine</p>
                 </div>
               </div>
             </div>
@@ -149,7 +147,7 @@ export function Layout({ children }) {
         </header>
 
         {/* Page content - aligned with navigation items */}
-        <main className="px-4 py-6">
+        <main className="px-6 py-8 max-w-7xl mx-auto">
           {children}
         </main>
       </div>
