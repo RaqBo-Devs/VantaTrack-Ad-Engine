@@ -53,15 +53,15 @@ export function Layout({ children }) {
       `}>
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-          <div className="flex flex-col items-center space-y-2">
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center overflow-hidden">
+          <div className="flex flex-col items-center space-y-3">
+            <div className="w-16 h-16 rounded-lg flex items-center justify-center overflow-hidden">
               <img 
                 src="/images/vantatrack-logo.svg" 
                 alt="VantaTrack Logo"
                 className="w-full h-full object-contain"
               />
             </div>
-            <p className="text-xs text-gray-600 font-medium">Ad Engine</p>
+            <p className="text-sm text-gray-600 font-medium">Ad Engine</p>
           </div>
           <button 
             className="lg:hidden"
