@@ -30,10 +30,19 @@ export default function AnalyticsPage() {
     }).format(amount);
   };
 
+  const formatCurrencyUSD = (amount) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+    }).format(amount);
+  };
+
   // Calculate analytics from sample data
   const analytics = {
     overview: {
-      totalSpent: 180000,
+      // Calculate total spent: Portal (BDT) + Google/Facebook (USD converted to BDT)
+      totalSpent: 73500 + (1115 * 110) + (1035 * 110), // Portal BDT + (Google USD * 110) + (Facebook USD * 110)
       totalImpressions: 665000,
       totalClicks: 23950,
       totalConversions: 1399,
@@ -43,8 +52,8 @@ export default function AnalyticsPage() {
     },
     platforms: {
       portal: { spent: 73500, campaigns: 4, impressions: 270000, clicks: 13500 },
-      google: { spent: 122650, campaigns: 3, impressions: 260000, clicks: 6500 },
-      facebook: { spent: 113850, campaigns: 4, impressions: 355000, clicks: 8950 }
+      google: { spent: 1115, campaigns: 3, impressions: 260000, clicks: 6500 },
+      facebook: { spent: 1035, campaigns: 4, impressions: 355000, clicks: 8950 }
     },
     performance: [
       { metric: 'ROI', value: '285%', change: '+12%', color: 'text-green-600' },
@@ -55,8 +64,8 @@ export default function AnalyticsPage() {
   };
 
   const topCampaigns = [
-    { name: 'Search Ads - Bangladesh News', platform: 'Google', spent: 49500, conversions: 225, roi: '312%' },
-    { name: 'Facebook Brand Awareness', platform: 'Facebook', spent: 31350, conversions: 142, roi: '278%' },
+    { name: 'Search Ads - Bangladesh News', platform: 'Google', spent: 450, conversions: 225, roi: '312%' },
+    { name: 'Facebook Brand Awareness', platform: 'Facebook', spent: 285, conversions: 142, roi: '278%' },
     { name: 'Prothom Alo Homepage Banner', platform: 'Portal', spent: 45000, conversions: 312, roi: '345%' },
     { name: 'Daily Star Header Campaign', platform: 'Portal', spent: 38000, conversions: 285, roi: '298%' }
   ];
@@ -96,7 +105,7 @@ export default function AnalyticsPage() {
         <MetricCard
           title="Total Spent"
           value={formatCurrency(analytics.overview.totalSpent)}
-          subtitle="Last 30 days"
+          subtitle={`Portal: ${formatCurrency(analytics.platforms.portal.spent)} | Global: ${formatCurrencyUSD(analytics.platforms.google.spent + analytics.platforms.facebook.spent)}`}
           icon="💰"
           trend={{ direction: 'up', value: '+12%' }}
         />
@@ -164,7 +173,7 @@ export default function AnalyticsPage() {
             <div className="space-y-3">
               <div className="flex justify-between">
                 <span className="text-green-700">Spent:</span>
-                <span className="font-bold text-green-900">{formatCurrency(analytics.platforms.google.spent)}</span>
+                <span className="font-bold text-green-900">{formatCurrencyUSD(analytics.platforms.google.spent)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-green-700">Campaigns:</span>
@@ -190,7 +199,7 @@ export default function AnalyticsPage() {
             <div className="space-y-3">
               <div className="flex justify-between">
                 <span className="text-purple-700">Spent:</span>
-                <span className="font-bold text-purple-900">{formatCurrency(analytics.platforms.facebook.spent)}</span>
+                <span className="font-bold text-purple-900">{formatCurrencyUSD(analytics.platforms.facebook.spent)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-purple-700">Campaigns:</span>
@@ -236,7 +245,11 @@ export default function AnalyticsPage() {
                   <p className="text-xs text-gray-500">{campaign.platform}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-bold text-gray-900">{formatCurrency(campaign.spent)}</p>
+                  <p className="text-sm font-bold text-gray-900">
+                    {campaign.platform === 'Google' || campaign.platform === 'Facebook' 
+                      ? formatCurrencyUSD(campaign.spent) 
+                      : formatCurrency(campaign.spent)}
+                  </p>
                   <p className="text-xs text-emerald-600 font-medium">ROI: {campaign.roi}</p>
                 </div>
               </div>
