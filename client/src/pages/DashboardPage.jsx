@@ -198,18 +198,26 @@ export default function DashboardPage() {
                 📺 Create New Placement
               </Button>
             </Link>
-            <Button variant="outline" className="w-full justify-start">
-              📤 Upload Google Ads Data
-            </Button>
-            <Button variant="outline" className="w-full justify-start">
-              📤 Upload Facebook Ads Data
-            </Button>
-            <Button variant="outline" className="w-full justify-start">
-              📋 Download CSV Templates
-            </Button>
-            <Button variant="outline" className="w-full justify-start">
-              👥 Manage Clients
-            </Button>
+            <Link href="/upload" className="block">
+              <Button variant="outline" className="w-full justify-start">
+                📤 Upload Google Ads Data
+              </Button>
+            </Link>
+            <Link href="/upload" className="block">
+              <Button variant="outline" className="w-full justify-start">
+                📤 Upload Facebook Ads Data
+              </Button>
+            </Link>
+            <Link href="/templates" className="block">
+              <Button variant="outline" className="w-full justify-start">
+                📋 Download CSV Templates
+              </Button>
+            </Link>
+            <Link href="/clients" className="block">
+              <Button variant="outline" className="w-full justify-start">
+                👥 Manage Clients
+              </Button>
+            </Link>
           </div>
         </Card>
       </div>
