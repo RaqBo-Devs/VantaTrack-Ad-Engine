@@ -83,12 +83,16 @@ export default function DashboardPage() {
           </p>
         </div>
         <div className="mt-4 sm:mt-0 flex space-x-3">
-          <Button variant="outline" size="sm">
-            📊 Export Report
-          </Button>
-          <Button size="sm">
-            ➕ New Campaign
-          </Button>
+          <Link href="/analytics">
+            <Button variant="outline" size="sm">
+              📊 Export Report
+            </Button>
+          </Link>
+          <Link href="/upload">
+            <Button size="sm">
+              ➕ New Campaign
+            </Button>
+          </Link>
         </div>
       </div>
 
