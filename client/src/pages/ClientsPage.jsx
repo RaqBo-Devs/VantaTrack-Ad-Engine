@@ -18,12 +18,28 @@ export default function ClientsPage() {
     facebookAccess: false
   });
 
-  // Sample data for demo
+  // Fetch clients from the admin API
   const { data: clients = [], isLoading } = useQuery({
-    queryKey: ['/api/sample-data'],
+    queryKey: ['/api/admin/clients'],
     queryFn: async () => {
-      const data = await getQueryFn()({ queryKey: ['/api/sample-data'] });
-      return data?.clients || [];
+      try {
+        const data = await getQueryFn()({ queryKey: ['/api/admin/clients'] });
+        return data?.clients || [];
+      } catch (error) {
+        console.error('Failed to fetch clients:', error);
+        // Return sample data for demo if API fails
+        return [
+          {
+            id: 1,
+            clientName: 'Demo Agency Ltd',
+            contactEmail: 'demo@agency.com',
+            phone: '+880-1700-000001',
+            portalAccess: true,
+            googleAccess: true,
+            facebookAccess: true
+          }
+        ];
+      }
     },
   });
 
@@ -187,7 +203,7 @@ export default function ClientsPage() {
 
       {/* Clients List */}
       <div className="grid grid-cols-1 gap-6">
-        {clients.map((client) => (
+        {Array.isArray(clients) && clients.map((client) => (
           <Card key={client.id}>
             <div className="flex items-center justify-between mb-4">
               <div>

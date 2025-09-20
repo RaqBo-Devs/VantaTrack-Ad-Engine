@@ -48,9 +48,10 @@ export function Layout({ children }) {
 
       {/* Sidebar */}
       <div className={`
-        fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0
+        fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 flex flex-col
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
+        {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-gradient-vanta rounded-lg flex items-center justify-center">
@@ -69,8 +70,9 @@ export function Layout({ children }) {
           </button>
         </div>
 
-        <nav className="mt-6 px-4">
-          <ul className="space-y-2">
+        {/* Navigation - flex-1 allows it to expand and push user section to bottom */}
+        <nav className="flex-1 mt-6 px-4 overflow-y-auto">
+          <ul className="space-y-2 pb-20">
             {getNavigation(user).map((item) => {
               const isActive = location === item.href;
               return (
@@ -88,11 +90,11 @@ export function Layout({ children }) {
           </ul>
         </nav>
 
-        {/* User info and logout */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200">
-          <div className="flex items-center space-x-3 mb-4">
-            <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
-              <span className="text-primary-600 font-medium">
+        {/* User info and logout - fixed at bottom with no absolute positioning */}
+        <div className="mt-auto p-4 border-t border-gray-200 bg-white">
+          <div className="flex items-center space-x-3 mb-3">
+            <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
+              <span className="text-primary-600 font-medium text-sm">
                 {user?.fullName?.[0]?.toUpperCase() || 'U'}
               </span>
             </div>
