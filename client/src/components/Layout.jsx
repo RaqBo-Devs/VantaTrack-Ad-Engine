@@ -36,7 +36,7 @@ export function Layout({ children }) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex">
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <div 
@@ -52,8 +52,8 @@ export function Layout({ children }) {
         fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 flex flex-col
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
-        {/* Header */}
-        <div className="flex items-center justify-end px-6 py-4 border-b border-gray-200">
+        {/* Header space in sidebar - aligned with main header */}
+        <div className="flex items-center justify-end px-6 py-3 border-b border-gray-200 h-16">
           <button 
             className="lg:hidden"
             onClick={() => setSidebarOpen(false)}
@@ -108,11 +108,11 @@ export function Layout({ children }) {
         </div>
       </div>
 
-      {/* Main content */}
-      <div className="lg:pl-64 flex flex-col min-h-screen">
-        {/* Top bar */}
-        <header className="bg-white shadow-sm border-b border-gray-200">
-          <div className="flex items-center justify-between px-4 py-3">
+      {/* Main content area */}
+      <div className="flex-1 flex flex-col min-h-screen">
+        {/* Top bar - aligned with sidebar header */}
+        <header className="bg-white shadow-sm border-b border-gray-200 h-16">
+          <div className="flex items-center justify-between px-4 h-full">
             <div className="flex items-center space-x-4">
               <button
                 className="lg:hidden p-2 rounded-md text-gray-600 hover:text-primary-600 hover:bg-gray-100"
@@ -123,7 +123,7 @@ export function Layout({ children }) {
               
               {/* Logo in main header */}
               <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden">
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center overflow-hidden">
                   <img 
                     src="/images/vantatrack-logo-cropped.svg" 
                     alt="VantaTrack Logo"
