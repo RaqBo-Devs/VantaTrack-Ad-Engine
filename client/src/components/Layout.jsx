@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { useLocation } from 'wouter';
+import { useLocation, Link } from 'wouter';
 import { Button } from '@/components/ui/Button';
 
 const getNavigation = (user) => {
@@ -69,10 +69,12 @@ export function Layout({ children }) {
               const isActive = location === item.href;
               return (
                 <li key={item.name}>
-                  <div className={isActive ? 'nav-link-active' : 'nav-link'}>
-                    <span className="mr-3 text-lg">{item.icon}</span>
-                    {item.name}
-                  </div>
+                  <Link href={item.href}>
+                    <div className={isActive ? 'nav-link-active' : 'nav-link'}>
+                      <span className="mr-3 text-lg">{item.icon}</span>
+                      {item.name}
+                    </div>
+                  </Link>
                 </li>
               );
             })}
@@ -123,7 +125,7 @@ export function Layout({ children }) {
               
               {/* Logo in main header */}
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 rounded-lg flex items-center justify-center overflow-hidden">
+                <div className="w-24 h-24 rounded-lg flex items-center justify-center overflow-hidden">
                   <img 
                     src="/images/vantatrack-logo-cropped.svg" 
                     alt="VantaTrack Logo"
