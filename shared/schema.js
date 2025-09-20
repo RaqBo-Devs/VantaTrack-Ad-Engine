@@ -144,3 +144,121 @@ export const vantatrackUserLoginActivity = pgTable("vantatrack_user_login_activi
   loginMethod: varchar("login_method", { length: 50 }).default("password"), // password, jwt, etc
   createdAt: timestamp("created_at").defaultNow(),
 });
+
+// ============ AD SERVING ENGINE TABLES ============
+
+// Publishers (Bangladesh newspaper portals)
+export const vantatrackPublishers = pgTable("vantatrack_publishers", {
+  id: serial("id").primaryKey(),
+  publisherName: varchar("publisher_name", { length: 255 }).notNull(), // Daily Star, Dhaka Tribune, etc
+  domain: varchar("domain", { length: 255 }).notNull().unique(), // thedailystar.net
+  contactEmail: varchar("contact_email", { length: 255 }).notNull(),
+  contactPhone: varchar("contact_phone", { length: 50 }),
+  revenueSplit: decimal("revenue_split", { precision: 5, scale: 4 }).default("0.7000"), // 70% to publisher
+  status: varchar("status", { length: 50 }).default("active"), // active, inactive
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Sites under each publisher
+export const vantatrackSites = pgTable("vantatrack_sites", {
+  id: serial("id").primaryKey(),
+  publisherId: integer("publisher_id").notNull(),
+  siteName: varchar("site_name", { length: 255 }).notNull(),
+  siteUrl: varchar("site_url", { length: 500 }).notNull(),
+  category: varchar("category", { length: 100 }), // news, sports, tech, etc
+  language: varchar("language", { length: 10 }).default("bn"), // bn for Bengali, en for English
+  status: varchar("status", { length: 50 }).default("active"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Ad placements/units on sites
+export const vantatrackPlacements = pgTable("vantatrack_placements", {
+  id: serial("id").primaryKey(),
+  siteId: integer("site_id").notNull(),
+  placementKey: varchar("placement_key", { length: 100 }).notNull().unique(), // embed key
+  placementName: varchar("placement_name", { length: 255 }).notNull(),
+  adSize: varchar("ad_size", { length: 50 }).notNull(), // 728x90, 300x250, 320x50, etc
+  position: varchar("position", { length: 100 }), // header, sidebar, footer, content
+  floorPriceBdt: decimal("floor_price_bdt", { precision: 10, scale: 2 }).default("0.50"), // minimum CPM
+  status: varchar("status", { length: 50 }).default("active"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Ad creatives/banners
+export const vantatrackCreatives = pgTable("vantatrack_creatives", {
+  id: serial("id").primaryKey(),
+  clientId: integer("client_id").notNull(),
+  creativeName: varchar("creative_name", { length: 255 }).notNull(),
+  creativeType: varchar("creative_type", { length: 50 }).notNull(), // banner, text, native
+  adSize: varchar("ad_size", { length: 50 }).notNull(),
+  htmlContent: text("html_content"), // For HTML banners
+  imageUrl: varchar("image_url", { length: 500 }), // For image banners
+  clickUrl: varchar("click_url", { length: 500 }).notNull(),
+  altText: varchar("alt_text", { length: 255 }),
+  status: varchar("status", { length: 50 }).default("active"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Campaign line items with targeting
+export const vantatrackLineItems = pgTable("vantatrack_line_items", {
+  id: serial("id").primaryKey(),
+  campaignId: integer("campaign_id").notNull(), // References vantatrackCampaigns
+  creativeId: integer("creative_id").notNull(),
+  lineItemName: varchar("line_item_name", { length: 255 }).notNull(),
+  bidCpmBdt: decimal("bid_cpm_bdt", { precision: 10, scale: 2 }).notNull(), // CPM bid in BDT
+  weight: integer("weight").default(100), // For rotation priority
+  targetingSites: text("targeting_sites"), // JSON array of site IDs
+  targetingCategories: text("targeting_categories"), // JSON array of categories
+  targetingLanguages: text("targeting_languages"), // JSON array of languages
+  targetingDevices: text("targeting_devices"), // JSON array: mobile, desktop, tablet
+  dailyBudgetBdt: decimal("daily_budget_bdt", { precision: 15, scale: 2 }),
+  totalBudgetBdt: decimal("total_budget_bdt", { precision: 15, scale: 2 }),
+  spentBdt: decimal("spent_bdt", { precision: 15, scale: 2 }).default("0"),
+  status: varchar("status", { length: 50 }).default("active"),
+  startDate: date("start_date"),
+  endDate: date("end_date"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Ad serving events (impressions, clicks)
+export const vantatrackAdEvents = pgTable("vantatrack_ad_events", {
+  id: serial("id").primaryKey(),
+  eventType: varchar("event_type", { length: 20 }).notNull(), // impression, click
+  placementId: integer("placement_id").notNull(),
+  creativeId: integer("creative_id").notNull(),
+  lineItemId: integer("line_item_id").notNull(),
+  campaignId: integer("campaign_id").notNull(),
+  clientId: integer("client_id").notNull(),
+  siteId: integer("site_id").notNull(),
+  publisherId: integer("publisher_id").notNull(),
+  userIp: varchar("user_ip", { length: 45 }),
+  userAgent: text("user_agent"),
+  referrer: varchar("referrer", { length: 500 }),
+  deviceType: varchar("device_type", { length: 20 }), // mobile, desktop, tablet
+  country: varchar("country", { length: 10 }), // BD, IN, etc
+  revenueBdt: decimal("revenue_bdt", { precision: 10, scale: 4 }).default("0"), // Revenue for this event
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Hourly aggregated metrics for fast reporting
+export const vantatrackAdAggregates = pgTable("vantatrack_ad_aggregates", {
+  id: serial("id").primaryKey(),
+  hour: timestamp("hour").notNull(), // Truncated to hour: 2024-01-01 14:00:00
+  placementId: integer("placement_id"),
+  creativeId: integer("creative_id"),
+  lineItemId: integer("line_item_id"),
+  campaignId: integer("campaign_id"),
+  clientId: integer("client_id"),
+  siteId: integer("site_id"),
+  publisherId: integer("publisher_id"),
+  impressions: integer("impressions").default(0),
+  clicks: integer("clicks").default(0),
+  revenueBdt: decimal("revenue_bdt", { precision: 15, scale: 2 }).default("0"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});

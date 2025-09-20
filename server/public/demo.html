@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VantaTrack Ad Serving Demo - Bangladesh Newspaper Portal</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+        }
+        .newspaper-header {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .ad-placement {
+            background: #fafafa;
+            border: 2px dashed #ddd;
+            padding: 10px;
+            margin: 20px 0;
+            text-align: center;
+            position: relative;
+        }
+        .ad-label {
+            position: absolute;
+            top: -10px;
+            left: 10px;
+            background: #2563eb;
+            color: white;
+            padding: 2px 8px;
+            font-size: 12px;
+            border-radius: 3px;
+        }
+        .news-section {
+            padding: 20px;
+        }
+        .news-article {
+            border-bottom: 1px solid #eee;
+            padding: 20px 0;
+        }
+        .news-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .news-meta {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        .sidebar {
+            width: 300px;
+            float: right;
+            background: #f9f9f9;
+            padding: 20px;
+            margin-left: 20px;
+        }
+        .main-content {
+            margin-right: 340px;
+        }
+        .footer {
+            clear: both;
+            background: #333;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .demo-info {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .demo-info h3 {
+            margin-top: 0;
+            color: #1976d2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Banner Ad -->
+        <div class="ad-placement">
+            <div class="ad-label">Header Banner (728x90)</div>
+            <div id="vanta-ad-daily-star-header-728x90" data-vanta-placement="daily-star-header-728x90">
+                <div style="height: 90px; display: flex; align-items: center; justify-content: center; color: #999;">
+                    Ad Loading...
+                </div>
+            </div>
+        </div>
+
+        <div class="newspaper-header">
+            <h1>🗞️ The Daily Star Demo</h1>
+            <p>Testing VantaTrack Ad Serving Engine Integration</p>
+        </div>
+
+        <div class="demo-info">
+            <h3>🚀 VantaTrack Ad Serving Demo</h3>
+            <p>This page demonstrates how Bangladesh newspaper portals can integrate VantaTrack's ad serving engine:</p>
+            <ul>
+                <li><strong>Header Banner:</strong> 728x90 leaderboard ad placement</li>
+                <li><strong>Sidebar Ad:</strong> 300x250 medium rectangle placement</li>
+                <li><strong>Real-time Ad Serving:</strong> Ads served via /ad/v1/serve API</li>
+                <li><strong>Impression Tracking:</strong> Automatic impression logging</li>
+                <li><strong>Click Tracking:</strong> Click-through tracking and redirection</li>
+            </ul>
+        </div>
+
+        <div class="sidebar">
+            <h3>📺 Sidebar</h3>
+            
+            <!-- Sidebar Ad -->
+            <div class="ad-placement">
+                <div class="ad-label">Sidebar Ad (300x250)</div>
+                <div id="vanta-ad-dhaka-tribune-sidebar-300x250" data-vanta-placement="dhaka-tribune-sidebar-300x250">
+                    <div style="height: 250px; display: flex; align-items: center; justify-content: center; color: #999;">
+                        Ad Loading...
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <h4>📰 Latest News</h4>
+                <ul>
+                    <li><a href="#">Bangladesh Economy Shows Strong Growth</a></li>
+                    <li><a href="#">Dhaka Traffic Solutions Announced</a></li>
+                    <li><a href="#">New Technology Hub Opens in Chittagong</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="news-section">
+                <div class="news-article">
+                    <div class="news-title">VantaTrack Revolutionizes Digital Advertising in Bangladesh</div>
+                    <div class="news-meta">Published: Today | By: Tech Reporter</div>
+                    <p>
+                        VantaTrack, the comprehensive ad serving and campaign management platform, is transforming how 
+                        digital agencies and newspaper portals manage their advertising operations in Bangladesh. 
+                        The platform provides both real-time ad serving capabilities and unified campaign tracking 
+                        across multiple platforms including Google Ads, Facebook Ads, and direct portal placements.
+                    </p>
+                    <p>
+                        With its innovative dual approach combining an ad serving engine with a campaign tracking dashboard, 
+                        VantaTrack enables Bangladesh news portals like The Daily Star, Dhaka Tribune, and Prothom Alo 
+                        to monetize their traffic more effectively while providing agencies with comprehensive analytics.
+                    </p>
+                </div>
+
+                <div class="news-article">
+                    <div class="news-title">How VantaTrack Ad Serving Works</div>
+                    <div class="news-meta">Published: Today | By: Digital Marketing Expert</div>
+                    <p>
+                        The VantaTrack ad serving engine works seamlessly with Bangladesh newspaper websites. 
+                        Publishers simply embed a small JavaScript snippet into their pages, and VantaTrack handles:
+                    </p>
+                    <ul>
+                        <li><strong>Real-time Ad Decision:</strong> Sub-100ms ad serving optimized for 3G connections</li>
+                        <li><strong>Revenue Optimization:</strong> Automatic bidding and placement optimization</li>
+                        <li><strong>Comprehensive Tracking:</strong> Impression and click tracking with detailed analytics</li>
+                        <li><strong>Bengali Language Support:</strong> Full localization for Bangladesh market</li>
+                    </ul>
+                    <p>
+                        The system automatically tracks all impressions and clicks, providing real-time revenue 
+                        data to both publishers and advertisers through the unified dashboard.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2024 Demo Newspaper Portal | Powered by VantaTrack Ad Engine</p>
+            <p>🎯 Real-time Ad Serving | 📊 Campaign Tracking | 💰 Revenue Optimization</p>
+        </div>
+    </div>
+
+    <!-- VantaTrack Ad Serving Integration -->
+    <script src="/ad/v1/tag.js"></script>
+    <script>
+        // Auto-initialize ads with data attributes (handled by VantaAdTag)
+        console.log('VantaTrack Ad Engine Demo Page Loaded');
+        console.log('Ad placements will be automatically initialized by VantaAdTag');
+        
+        // Manual initialization example (optional)
+        window.addEventListener('load', function() {
+            console.log('Page fully loaded, VantaAdTag ready:', window.VantaAdTag ? 'Yes' : 'No');
+        });
+    </script>
+</body>
+</html>

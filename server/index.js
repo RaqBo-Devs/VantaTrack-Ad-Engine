@@ -13,6 +13,7 @@ import dashboardRouter from './routes/dashboard.js';
 import integrationsRouter from './routes/integrations.js';
 import adminRouter from './routes/admin.js';
 import inviteRouter from './routes/invite.js';
+import adServingRouter from './routes/adServing.js';
 import { authLimiter, inviteLimiter, apiLimiter, uploadLimiter } from './middleware/rateLimiting.js';
 
 dotenv.config();
@@ -46,8 +47,43 @@ const PORT = process.env.PORT || 5000;
 
 // Security middleware
 app.use(helmet());
+
+// CORS configuration for Bangladesh newspaper portals
+const allowedOrigins = [
+  'http://localhost:3000', 
+  'http://localhost:5173', 
+  'http://localhost:5000', 
+  'http://0.0.0.0:5000',
+  // Bangladesh newspaper portals
+  'https://www.thedailystar.net',
+  'https://thedailystar.net',
+  'https://www.dhakatribune.com',
+  'https://dhakatribune.com',
+  'https://www.prothomalo.com',
+  'https://prothomalo.com',
+  'https://www.bdnews24.com',
+  'https://bdnews24.com',
+  'https://www.newagebd.net',
+  'https://newagebd.net'
+];
+
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:5000', 'http://0.0.0.0:5000'],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, etc.)
+    if (!origin) return callback(null, true);
+    
+    // Check if origin is in allowed list or is an ad serving request
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    
+    // Allow ad serving requests from any origin
+    if (origin && allowedOrigins.some(allowed => origin.includes(allowed.replace('https://', '').replace('www.', '')))) {
+      return callback(null, true);
+    }
+    
+    return callback(new Error('Not allowed by CORS'));
+  },
   credentials: true
 }));
 
@@ -71,6 +107,9 @@ app.use('/api/upload', requireAuth, uploadRouter);
 app.use('/api/integrations', requireAuth, integrationsRouter);
 app.use('/api/admin', requireAuth, adminRouter);
 app.use('/api/invite', inviteRouter);
+
+// Ad serving engine routes (public, no auth required)
+app.use('/ad', adServingRouter);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

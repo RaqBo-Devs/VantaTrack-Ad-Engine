@@ -9,6 +9,7 @@ const getNavigation = (user) => {
     { name: 'Campaigns', href: '/campaigns', icon: '🎯' },
     { name: 'Clients', href: '/clients', icon: '👥' },
     { name: 'Analytics', href: '/analytics', icon: '📈' },
+    { name: 'Ad Placements', href: '/placements', icon: '📺' },
     { name: 'Upload Data', href: '/upload', icon: '📤' },
     { name: 'Templates', href: '/templates', icon: '📋' },
   ];

@@ -13,6 +13,7 @@ import UploadPage from '@/pages/UploadPage';
 import CampaignsPage from '@/pages/CampaignsPage';
 import ClientsPage from '@/pages/ClientsPage';
 import AnalyticsPage from '@/pages/AnalyticsPage';
+import PlacementManagerPage from '@/pages/PlacementManagerPage';
 import AdminPage from '@/pages/AdminPage';
 import { InvitePage } from '@/pages/InvitePage';
 
@@ -46,6 +47,9 @@ function App() {
                   </Route>
                   <Route path="/analytics">
                     <AnalyticsPage />
+                  </Route>
+                  <Route path="/placements">
+                    <PlacementManagerPage />
                   </Route>
                   <Route path="/upload" component={UploadPage} />
                   <Route path="/templates" component={TemplatesPage} />
