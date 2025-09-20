@@ -147,7 +147,7 @@ export function Layout({ children }) {
         </div>
 
         {/* Main content area */}
-        <div className="flex-1">
+        <div className="flex-1 pl-6">
           <main className="pl-0 pr-6 py-6">
             <div className="max-w-7xl">
               {children}
