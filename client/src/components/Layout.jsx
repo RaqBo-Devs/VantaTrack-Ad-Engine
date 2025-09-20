@@ -109,10 +109,10 @@ export function Layout({ children }) {
       </div>
 
       {/* Main content */}
-      <div className="lg:pl-64">
+      <div className="lg:pl-64 flex flex-col min-h-screen">
         {/* Top bar */}
         <header className="bg-white shadow-sm border-b border-gray-200">
-          <div className="flex items-center justify-between px-4 py-4">
+          <div className="flex items-center justify-between px-4 py-3">
             <div className="flex items-center space-x-4">
               <button
                 className="lg:hidden p-2 rounded-md text-gray-600 hover:text-primary-600 hover:bg-gray-100"
@@ -123,7 +123,7 @@ export function Layout({ children }) {
               
               {/* Logo in main header */}
               <div className="flex items-center space-x-3">
-                <div className="w-16 h-16 rounded-lg flex items-center justify-center overflow-hidden">
+                <div className="w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden">
                   <img 
                     src="/images/vantatrack-logo-cropped.svg" 
                     alt="VantaTrack Logo"
@@ -146,8 +146,10 @@ export function Layout({ children }) {
         </header>
 
         {/* Page content - aligned with navigation items */}
-        <main className="px-6 py-8 max-w-7xl mx-auto">
-          {children}
+        <main className="flex-1 px-6 py-6">
+          <div className="max-w-7xl mx-auto">
+            {children}
+          </div>
         </main>
       </div>
     </div>
