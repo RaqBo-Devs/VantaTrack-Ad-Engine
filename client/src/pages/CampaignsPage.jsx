@@ -117,12 +117,16 @@ export default function CampaignsPage() {
           </p>
         </div>
         <div className="mt-4 sm:mt-0 flex space-x-3">
-          <Button variant="outline" size="sm">
-            📊 Export Report
-          </Button>
-          <Button size="sm">
-            ➕ New Campaign
-          </Button>
+          <Link href="/analytics">
+            <Button variant="outline" size="sm">
+              📊 Export Report
+            </Button>
+          </Link>
+          <Link href="/upload">
+            <Button size="sm">
+              ➕ New Campaign
+            </Button>
+          </Link>
         </div>
       </div>
 
@@ -163,12 +167,16 @@ export default function CampaignsPage() {
           </div>
           
           <div className="flex space-x-2">
-            <Button variant="outline" size="sm">
-              📤 Bulk Upload
-            </Button>
-            <Button variant="outline" size="sm">
-              📋 Templates
-            </Button>
+            <Link href="/upload">
+              <Button variant="outline" size="sm">
+                📤 Bulk Upload
+              </Button>
+            </Link>
+            <Link href="/templates">
+              <Button variant="outline" size="sm">
+                📋 Templates
+              </Button>
+            </Link>
           </div>
         </div>
       </Card>
@@ -196,15 +204,21 @@ export default function CampaignsPage() {
               </div>
               
               <div className="flex space-x-2">
-                <Button variant="outline" size="sm">
-                  📊 Analytics
-                </Button>
-                <Button variant="outline" size="sm">
-                  ✏️ Edit
-                </Button>
-                <Button variant="outline" size="sm">
-                  ⚙️ Settings
-                </Button>
+                <Link href="/analytics">
+                  <Button variant="outline" size="sm">
+                    📊 Analytics
+                  </Button>
+                </Link>
+                <Link href="/campaigns">
+                  <Button variant="outline" size="sm">
+                    ✏️ Edit
+                  </Button>
+                </Link>
+                <Link href="/campaigns">
+                  <Button variant="outline" size="sm">
+                    ⚙️ Settings
+                  </Button>
+                </Link>
               </div>
             </div>
 
