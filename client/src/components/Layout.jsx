@@ -54,8 +54,12 @@ export function Layout({ children }) {
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-vanta rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">V</span>
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center overflow-hidden">
+              <img 
+                src="/images/vantatrack-logo.svg" 
+                alt="VantaTrack Logo"
+                className="w-full h-full object-contain"
+              />
             </div>
             <div>
               <h1 className="text-lg font-bold text-gray-900">VantaTrack</h1>
