@@ -36,7 +36,7 @@ export function Layout({ children }) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <div 
@@ -47,112 +47,113 @@ export function Layout({ children }) {
         </div>
       )}
 
-      {/* Sidebar */}
-      <div className={`
-        fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 flex flex-col
-        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-      `}>
-        {/* Header space in sidebar - aligned with main header */}
-        <div className="flex items-center justify-end px-6 py-3 border-b border-gray-200 h-16">
-          <button 
-            className="lg:hidden"
-            onClick={() => setSidebarOpen(false)}
-          >
-            ✕
-          </button>
-        </div>
-
-        {/* Navigation - flex-1 allows it to expand and push user section to bottom */}
-        <nav className="flex-1 mt-6 px-4 overflow-y-auto">
-          <ul className="space-y-2 pb-20">
-            {getNavigation(user).map((item) => {
-              const isActive = location === item.href;
-              return (
-                <li key={item.name}>
-                  <Link href={item.href}>
-                    <div className={isActive ? 'nav-link-active' : 'nav-link'}>
-                      <span className="mr-3 text-lg">{item.icon}</span>
-                      {item.name}
-                    </div>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
-
-        {/* User info and logout - fixed at bottom with no absolute positioning */}
-        <div className="mt-auto p-4 border-t border-gray-200 bg-white">
-          <div className="flex items-center space-x-3 mb-3">
-            <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
-              <span className="text-primary-600 font-medium text-sm">
-                {user?.fullName?.[0]?.toUpperCase() || 'U'}
-              </span>
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 truncate">
-                {user?.fullName || 'User'}
-              </p>
-              <p className="text-xs text-gray-500 truncate">
-                {user?.role?.replace('_', ' ')?.replace(/\b\w/g, l => l.toUpperCase())}
-              </p>
-            </div>
-          </div>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="w-full text-gray-600"
-            onClick={handleLogout}
-            loading={logoutMutation.isPending}
-          >
-            Sign out
-          </Button>
-        </div>
-      </div>
-
-      {/* Main content area */}
-      <div className="flex-1 flex flex-col min-h-screen">
-        {/* Top bar - aligned with sidebar header */}
-        <header className="bg-white shadow-sm border-b border-gray-200 h-16">
-          <div className="flex items-center justify-between px-4 h-full">
-            <div className="flex items-center space-x-4">
-              <button
-                className="lg:hidden p-2 rounded-md text-gray-600 hover:text-primary-600 hover:bg-gray-100"
-                onClick={() => setSidebarOpen(true)}
-              >
-                <span className="text-xl">☰</span>
-              </button>
-              
-              {/* Logo in main header */}
-              <div className="flex items-center space-x-3">
-                <div className="w-48 h-48 rounded-lg flex items-center justify-center overflow-hidden">
-                  <img 
-                    src="/images/vantatrack-logo-cropped.svg" 
-                    alt="VantaTrack Logo"
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-                <div>
-                  <p className="text-lg font-medium text-gray-900">Ad Engine</p>
-                </div>
-              </div>
-            </div>
+      {/* Full-width header at the top */}
+      <header className="bg-white shadow-sm border-b border-gray-200 h-16 w-full">
+        <div className="flex items-center justify-between px-4 h-full">
+          <div className="flex items-center space-x-4">
+            <button
+              className="lg:hidden p-2 rounded-md text-gray-600 hover:text-primary-600 hover:bg-gray-100"
+              onClick={() => setSidebarOpen(true)}
+            >
+              <span className="text-xl">☰</span>
+            </button>
             
-            <div className="flex items-center space-x-4">
-              <div className="text-right">
-                <p className="text-sm font-medium text-gray-900">{user?.fullName}</p>
-                <p className="text-xs text-gray-500">{user?.email}</p>
+            {/* Logo in header */}
+            <div className="flex items-center space-x-3">
+              <div className="w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden">
+                <img 
+                  src="/images/vantatrack-logo-cropped.svg" 
+                  alt="VantaTrack Logo"
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <div>
+                <p className="text-lg font-medium text-gray-900">Ad Engine</p>
               </div>
             </div>
           </div>
-        </header>
-
-        {/* Page content - aligned with navigation items */}
-        <main className="flex-1 px-6 py-6">
-          <div className="max-w-7xl mx-auto">
-            {children}
+          
+          <div className="flex items-center space-x-4">
+            <div className="text-right">
+              <p className="text-sm font-medium text-gray-900">{user?.fullName}</p>
+              <p className="text-xs text-gray-500">{user?.email}</p>
+            </div>
           </div>
-        </main>
+        </div>
+      </header>
+
+      {/* Content area with sidebar and main content side by side */}
+      <div className="flex-1 flex">
+        {/* Sidebar */}
+        <div className={`
+          fixed inset-y-0 left-0 top-16 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 flex flex-col
+          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+        `}>
+          {/* Close button for mobile */}
+          <div className="flex items-center justify-end px-6 py-3 border-b border-gray-200 lg:hidden">
+            <button 
+              onClick={() => setSidebarOpen(false)}
+            >
+              ✕
+            </button>
+          </div>
+
+          {/* Navigation */}
+          <nav className="flex-1 mt-6 px-4 overflow-y-auto">
+            <ul className="space-y-2 pb-20">
+              {getNavigation(user).map((item) => {
+                const isActive = location === item.href;
+                return (
+                  <li key={item.name}>
+                    <Link href={item.href}>
+                      <div className={isActive ? 'nav-link-active' : 'nav-link'}>
+                        <span className="mr-3 text-lg">{item.icon}</span>
+                        {item.name}
+                      </div>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
+
+          {/* User info and logout */}
+          <div className="mt-auto p-4 border-t border-gray-200 bg-white">
+            <div className="flex items-center space-x-3 mb-3">
+              <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
+                <span className="text-primary-600 font-medium text-sm">
+                  {user?.fullName?.[0]?.toUpperCase() || 'U'}
+                </span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-900 truncate">
+                  {user?.fullName || 'User'}
+                </p>
+                <p className="text-xs text-gray-500 truncate">
+                  {user?.role?.replace('_', ' ')?.replace(/\b\w/g, l => l.toUpperCase())}
+                </p>
+              </div>
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="w-full text-gray-600"
+              onClick={handleLogout}
+              loading={logoutMutation.isPending}
+            >
+              Sign out
+            </Button>
+          </div>
+        </div>
+
+        {/* Main content area */}
+        <div className="flex-1 lg:pl-64">
+          <main className="px-6 py-6">
+            <div className="max-w-7xl mx-auto">
+              {children}
+            </div>
+          </main>
+        </div>
       </div>
     </div>
   );
