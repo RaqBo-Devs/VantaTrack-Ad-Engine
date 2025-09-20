@@ -13,7 +13,7 @@ import dashboardRouter from './routes/dashboard.js';
 import integrationsRouter from './routes/integrations.js';
 import adminRouter from './routes/admin.js';
 import inviteRouter from './routes/invite.js';
-import { authLimiter, apiLimiter, uploadLimiter } from './middleware/rateLimiting.js';
+import { authLimiter, inviteLimiter, apiLimiter, uploadLimiter } from './middleware/rateLimiting.js';
 
 dotenv.config();
 
@@ -55,8 +55,8 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Apply rate limiting
-app.use('/api/auth/', authLimiter);
+// Apply rate limiting (order matters - specific routes first)
+app.use('/api/invite/', inviteLimiter);
 app.use('/api/upload/', uploadLimiter);
 app.use('/api/', apiLimiter);
 

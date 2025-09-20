@@ -9,11 +9,19 @@ export const authLimiter = rateLimit({
     retryAfter: '15 minutes'
   },
   standardHeaders: true,
-  legacyHeaders: false,
-  // Apply to auth routes
-  skip: (req) => {
-    return !req.path.startsWith('/api/auth/');
-  }
+  legacyHeaders: false
+});
+
+// Rate limiting for invite endpoints (same strict policy as auth)
+export const inviteLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Limit each IP to 5 invite attempts per windowMs
+  message: {
+    error: 'Too many invite attempts, please try again later.',
+    retryAfter: '15 minutes'
+  },
+  standardHeaders: true,
+  legacyHeaders: false
 });
 
 // General API rate limiting
@@ -26,9 +34,9 @@ export const apiLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-  // Skip auth routes (they have their own limiter)
+  // Skip auth and invite routes (they have their own limiters)
   skip: (req) => {
-    return req.path.startsWith('/api/auth/');
+    return req.originalUrl.startsWith('/api/auth/') || req.originalUrl.startsWith('/api/invite/');
   }
 });
 

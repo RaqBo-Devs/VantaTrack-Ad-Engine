@@ -116,8 +116,21 @@ export function setupAuth(app) {
         return res.status(401).json({ error: info?.message || "Authentication failed" });
       }
 
-      req.login(user, (err) => {
+      req.login(user, async (err) => {
         if (err) return next(err);
+        
+        // Log user login activity
+        try {
+          await storage.logUserActivity(
+            user.id,
+            req.ip || req.connection.remoteAddress,
+            req.get('User-Agent') || 'Unknown',
+            'password'
+          );
+        } catch (logError) {
+          console.error('Error logging user activity:', logError);
+          // Don't fail the login if activity logging fails
+        }
         
         // Generate JWT token
         const token = jwt.sign(
@@ -147,13 +160,9 @@ export function setupAuth(app) {
     res.json({ ...req.user, passwordHash: undefined });
   });
 
-  // Middleware to require authentication
+  // Middleware to require authentication (JWT-only for API security)
   function requireAuth(req, res, next) {
-    if (req.isAuthenticated()) {
-      return next();
-    }
-    
-    // Try JWT authentication
+    // Use JWT-only authentication for APIs to eliminate CSRF risks
     passport.authenticate('jwt', { session: false })(req, res, (err) => {
       if (err) return next(err);
       if (!req.user) {
