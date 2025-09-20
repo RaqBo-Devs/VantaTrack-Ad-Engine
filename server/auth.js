@@ -105,51 +105,8 @@ export function setupAuth(app) {
     }
   });
 
-  // Registration endpoint
-  app.post("/api/auth/register", async (req, res, next) => {
-    try {
-      const { email, password, fullName, role, agencyId } = req.body;
-
-      // Validation
-      if (!email || !password || !fullName || !role) {
-        return res.status(400).json({ error: "All fields are required" });
-      }
-
-      if (!['agency_admin', 'client_user', 'client_admin', 'portal_owner'].includes(role)) {
-        return res.status(400).json({ error: "Invalid role" });
-      }
-
-      const existingUser = await storage.getUserByEmail(email);
-      if (existingUser) {
-        return res.status(400).json({ error: "Email already exists" });
-      }
-
-      const user = await storage.createUser({
-        email,
-        passwordHash: await hashPassword(password),
-        fullName,
-        role,
-        agencyId: agencyId || null,
-      });
-
-      // Generate JWT token
-      const token = jwt.sign(
-        { userId: user.id, email: user.email, role: user.role },
-        JWT_SECRET,
-        { expiresIn: '24h' }
-      );
-
-      req.login(user, (err) => {
-        if (err) return next(err);
-        res.status(201).json({ 
-          user: { ...user, passwordHash: undefined },
-          token
-        });
-      });
-    } catch (error) {
-      next(error);
-    }
-  });
+  // Public registration disabled - VantaTrack now uses invite-only onboarding
+  // Registration is handled through the admin invite system only
 
   // Login endpoint
   app.post("/api/auth/login", (req, res, next) => {

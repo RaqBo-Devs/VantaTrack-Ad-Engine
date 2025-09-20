@@ -34,22 +34,7 @@ export function AuthProvider({ children }) {
     },
   });
 
-  const registerMutation = useMutation({
-    mutationFn: async (credentials) => {
-      const res = await apiRequest("POST", "/api/auth/register", credentials);
-      return await res.json();
-    },
-    onSuccess: (data) => {
-      queryClient.setQueryData(["/api/auth/user"], data.user);
-      // Store token in localStorage for API requests
-      if (data.token) {
-        localStorage.setItem('vantatrack_token', data.token);
-      }
-    },
-    onError: (error) => {
-      console.error('Registration failed:', error);
-    },
-  });
+  // Registration removed - VantaTrack now uses invite-only onboarding
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
@@ -72,7 +57,6 @@ export function AuthProvider({ children }) {
         error,
         loginMutation,
         logoutMutation,
-        registerMutation,
       }}
     >
       {children}

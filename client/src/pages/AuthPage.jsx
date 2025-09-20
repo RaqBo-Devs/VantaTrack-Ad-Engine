@@ -5,13 +5,10 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 
 export default function AuthPage() {
-  const { user, loginMutation, registerMutation } = useAuth();
-  const [isLogin, setIsLogin] = useState(true);
+  const { user, loginMutation } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
-    password: '',
-    fullName: '',
-    role: 'agency_admin'
+    password: ''
   });
 
   // Redirect if already logged in
@@ -22,19 +19,10 @@ export default function AuthPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (isLogin) {
-      loginMutation.mutate({
-        email: formData.email,
-        password: formData.password
-      });
-    } else {
-      registerMutation.mutate({
-        email: formData.email,
-        password: formData.password,
-        fullName: formData.fullName,
-        role: formData.role
-      });
-    }
+    loginMutation.mutate({
+      email: formData.email,
+      password: formData.password
+    });
   };
 
   const handleChange = (e) => {
@@ -60,27 +48,15 @@ export default function AuthPage() {
               </div>
             </div>
             <h2 className="text-3xl font-bold text-gray-900">
-              {isLogin ? 'Sign in to your account' : 'Create your account'}
+              Sign in to your account
             </h2>
             <p className="mt-2 text-sm text-gray-600">
-              Complete Media Management for Bangladesh Agencies
+              Welcome back to VantaTrack
             </p>
           </div>
 
           <div className="mt-8">
             <form className="space-y-6" onSubmit={handleSubmit}>
-              {!isLogin && (
-                <Input
-                  label="Full Name"
-                  name="fullName"
-                  type="text"
-                  required
-                  value={formData.fullName}
-                  onChange={handleChange}
-                  placeholder="Enter your full name"
-                />
-              )}
-
               <Input
                 label="Email Address"
                 name="email"
@@ -96,69 +72,40 @@ export default function AuthPage() {
                 label="Password"
                 name="password"
                 type="password"
-                autoComplete={isLogin ? "current-password" : "new-password"}
+                autoComplete="current-password"
                 required
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="Enter your password"
               />
 
-              {!isLogin && (
-                <div className="space-y-2">
-                  <label className="form-label">Account Type</label>
-                  <select
-                    name="role"
-                    value={formData.role}
-                    onChange={handleChange}
-                    className="form-input"
-                    required
-                  >
-                    <option value="agency_admin">Agency Administrator</option>
-                    <option value="portal_owner">Portal Owner</option>
-                    <option value="client_admin">Client Administrator</option>
-                  </select>
-                </div>
-              )}
-
               <div>
                 <Button
                   type="submit"
                   className="w-full"
-                  loading={loginMutation.isPending || registerMutation.isPending}
-                  disabled={loginMutation.isPending || registerMutation.isPending}
+                  loading={loginMutation.isPending}
+                  disabled={loginMutation.isPending}
                 >
-                  {isLogin ? 'Sign in' : 'Create account'}
+                  Sign in
                 </Button>
               </div>
 
-              {(loginMutation.error || registerMutation.error) && (
+              {loginMutation.error && (
                 <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                   <p className="text-red-800 text-sm">
-                    {loginMutation.error?.message || registerMutation.error?.message || 'Authentication failed. Please try again.'}
+                    {loginMutation.error?.message || 'Authentication failed. Please try again.'}
                   </p>
                 </div>
               )}
             </form>
 
             <div className="mt-6">
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-300" />
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-white text-gray-500">
-                    {isLogin ? "Don't have an account?" : "Already have an account?"}
-                  </span>
-                </div>
-              </div>
-              <div className="mt-6">
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => setIsLogin(!isLogin)}
-                >
-                  {isLogin ? 'Create new account' : 'Sign in instead'}
-                </Button>
+              <div className="text-center">
+                <p className="text-sm text-gray-600">
+                  VantaTrack uses invite-only access.
+                  <br />
+                  Contact your administrator for account access.
+                </p>
               </div>
             </div>
           </div>
