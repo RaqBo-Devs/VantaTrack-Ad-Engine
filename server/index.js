@@ -54,6 +54,11 @@ const allowedOrigins = [
   'http://localhost:5173', 
   'http://localhost:5000', 
   'http://0.0.0.0:5000',
+  // Replit domain (dynamically add current domain)
+  ...(process.env.REPLIT_DEV_DOMAIN ? [
+    `https://${process.env.REPLIT_DEV_DOMAIN}`,
+    `http://${process.env.REPLIT_DEV_DOMAIN}`
+  ] : []),
   // Bangladesh newspaper portals
   'https://www.thedailystar.net',
   'https://thedailystar.net',
