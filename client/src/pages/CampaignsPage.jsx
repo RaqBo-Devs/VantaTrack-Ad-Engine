@@ -4,6 +4,7 @@ import { getQueryFn } from '@/lib/queryClient';
 import { Card, MetricCard } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Select } from '@/components/ui/Input';
+import { Link } from 'wouter';
 
 export default function CampaignsPage() {
   const [selectedPlatform, setSelectedPlatform] = useState('all');
