@@ -96,6 +96,9 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Ad serving engine routes (public, no auth required, no rate limiting for high volume)
+app.use('/api/ad-serving', adServingRouter);
+
 // Apply rate limiting (order matters - specific routes first)
 app.use('/api/invite/', inviteLimiter);
 app.use('/api/upload/', uploadLimiter);
@@ -112,9 +115,6 @@ app.use('/api/upload', requireAuth, uploadRouter);
 app.use('/api/integrations', requireAuth, integrationsRouter);
 app.use('/api/admin', requireAuth, adminRouter);
 app.use('/api/invite', inviteRouter);
-
-// Ad serving engine routes (public, no auth required)
-app.use('/api/ad-serving', adServingRouter);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

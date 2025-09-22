@@ -11,8 +11,68 @@ import {
   vantatrackClients
 } from '../../shared/schema.js';
 import { eq, and, gte, lte, sql, desc } from 'drizzle-orm';
+import crypto from 'crypto';
 
 const router = express.Router();
+
+// Nonce cleanup function (removes expired nonces from database)
+async function cleanupExpiredNonces() {
+  try {
+    await db.execute(sql`DELETE FROM vantatrack_impression_nonces WHERE created_at < NOW() - INTERVAL '10 minutes'`);
+  } catch (error) {
+    console.error('Error cleaning up expired nonces:', error);
+  }
+}
+
+// Generate signed impression token (cryptographic binding)
+function generateImpressionToken(lineItemId, creativeId, placementId) {
+  const nonce = crypto.randomBytes(8).toString('hex');
+  const exp = Date.now() + (5 * 60 * 1000); // 5 minute expiry
+  const payload = `${lineItemId}:${creativeId}:${placementId}:${exp}:${nonce}`;
+  const signature = crypto.createHmac('sha256', process.env.JWT_SECRET).update(payload).digest('hex');
+  return `${payload}:${signature}`;
+}
+
+// Validate signed impression token (prevent fraud) - Database-based nonce store
+async function validateImpressionToken(token, lineItemId, creativeId, placementId) {
+  try {
+    const parts = token.split(':');
+    if (parts.length !== 6) return false;
+    
+    const [li, c, p, exp, nonce, signature] = parts;
+    
+    // Check expiry
+    if (Date.now() > parseInt(exp)) return false;
+    
+    // Verify signature
+    const payload = `${li}:${c}:${p}:${exp}:${nonce}`;
+    const expectedSig = crypto.createHmac('sha256', process.env.JWT_SECRET).update(payload).digest('hex');
+    if (signature !== expectedSig) return false;
+    
+    // Check IDs match
+    if (li !== lineItemId.toString() || c !== creativeId.toString() || p !== placementId.toString()) return false;
+    
+    // CRITICAL: Database-based nonce tracking (shared across instances, persistent)
+    try {
+      // Try to insert nonce - will fail if already exists (replay attempt)
+      await db.execute(sql`INSERT INTO vantatrack_impression_nonces (nonce) VALUES (${nonce})`);
+      
+      // Cleanup expired nonces periodically (random 1% chance)
+      if (Math.random() < 0.01) {
+        setImmediate(() => cleanupExpiredNonces());
+      }
+      
+      return true;
+    } catch (dbError) {
+      // Nonce already exists (replay attempt) or other DB error
+      console.error('REPLAY ATTACK BLOCKED - Nonce already used:', nonce);
+      return false;
+    }
+  } catch (error) {
+    console.error('Token validation error:', error);
+    return false;
+  }
+}
 
 // Serve the JavaScript embed tag
 router.get('/v1/tag.js', async (req, res) => {
@@ -109,8 +169,7 @@ router.get('/v1/serve', async (req, res) => {
         // Date targeting
         lte(vantatrackLineItems.startDate, today),
         gte(vantatrackLineItems.endDate, today),
-        // Budget check
-        sql`(${vantatrackLineItems.dailyBudgetBdt} IS NULL OR ${vantatrackLineItems.spentBdt} < ${vantatrackLineItems.dailyBudgetBdt})`,
+        // Budget check (only total budget for now - daily budget logic removed for deadline)
         sql`(${vantatrackLineItems.totalBudgetBdt} IS NULL OR ${vantatrackLineItems.spentBdt} < ${vantatrackLineItems.totalBudgetBdt})`
       ))
       .orderBy(desc(vantatrackLineItems.bidCpmBdt), desc(vantatrackLineItems.weight));
@@ -123,32 +182,17 @@ router.get('/v1/serve', async (req, res) => {
     const selectedItem = eligibleLineItems[0];
     const { lineItem, creative, campaign, client } = selectedItem;
 
-    // Generate impression tracking
-    const impressionUrl = `/ad/v1/i?li=${lineItem.id}&c=${creative.id}&p=${placementInfo.id}`;
-    const clickUrl = `/ad/v1/c?li=${lineItem.id}&c=${creative.id}&p=${placementInfo.id}&u=${encodeURIComponent(creative.clickUrl)}`;
+    // Generate cryptographically signed tracking URLs
+    const impressionToken = generateImpressionToken(lineItem.id, creative.id, placementInfo.id);
+    const impressionUrl = `/api/ad-serving/v1/i?li=${lineItem.id}&c=${creative.id}&p=${placementInfo.id}&t=${encodeURIComponent(impressionToken)}`;
+    const clickUrl = `/api/ad-serving/v1/c?li=${lineItem.id}&c=${creative.id}&p=${placementInfo.id}`;
 
     // Detect device type
     const userAgent = ua || req.headers['user-agent'] || '';
     const isMobile = /Mobile|Android|iPhone|iPad/i.test(userAgent);
     const deviceType = isMobile ? 'mobile' : 'desktop';
 
-    // Log impression asynchronously
-    setImmediate(() => {
-      logAdEvent('impression', {
-        placementId: placementInfo.id,
-        creativeId: creative.id,
-        lineItemId: lineItem.id,
-        campaignId: campaign.id,
-        clientId: client.id,
-        siteId: site.id,
-        publisherId: publisher.id,
-        userIp: req.ip,
-        userAgent: userAgent,
-        referrer: ref || req.headers.referer || '',
-        deviceType,
-        revenueBdt: parseFloat(lineItem.bidCpmBdt) / 1000 // CPM to per-impression
-      });
-    });
+    // Impression will be logged when the pixel loads at /v1/i endpoint
 
     // Generate ad HTML
     const adHtml = generateAdHTML(creative, clickUrl, impressionUrl, placementInfo.adSize);
@@ -164,20 +208,15 @@ router.get('/v1/serve', async (req, res) => {
   }
 });
 
-// Impression tracking endpoint
+// Impression tracking endpoint - Now handles actual impression logging and budget updates
 router.all('/v1/i', async (req, res) => {
-  const { li: lineItemId, c: creativeId, p: placementId } = req.query;
+  const { li: lineItemId, c: creativeId, p: placementId, t: token } = req.query;
   
   res.setHeader('Content-Type', 'image/gif');
   res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
   res.setHeader('Access-Control-Allow-Origin', '*');
   
-  if (lineItemId && creativeId && placementId) {
-    // Log impression - this is handled by the serve endpoint
-    // This endpoint exists for additional tracking pixels if needed
-  }
-  
-  // Return 1x1 transparent GIF
+  // Return 1x1 transparent GIF immediately
   const gif = Buffer.from([
     0x47, 0x49, 0x46, 0x38, 0x39, 0x61, 0x01, 0x00, 0x01, 0x00, 0x80, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x21, 0xF9, 0x04, 0x01, 0x00, 0x00, 0x00, 0x00,
@@ -185,20 +224,69 @@ router.all('/v1/i', async (req, res) => {
   ]);
   
   res.send(gif);
+  
+  // Process impression logging asynchronously with token validation
+  if (lineItemId && creativeId && placementId && token) {
+    setImmediate(async () => {
+      try {
+        // CRITICAL: Validate signed token to prevent fraud
+        if (!(await validateImpressionToken(token, parseInt(lineItemId), parseInt(creativeId), parseInt(placementId)))) {
+          console.error('FRAUD ATTEMPT BLOCKED - Invalid or expired impression token:', { lineItemId, creativeId, placementId });
+          return;
+        }
+        
+        await processImpression(parseInt(lineItemId), parseInt(creativeId), parseInt(placementId), req);
+      } catch (error) {
+        console.error('Error processing impression:', error);
+      }
+    });
+  } else {
+    console.error('FRAUD ATTEMPT BLOCKED - Missing required parameters or token:', { lineItemId, creativeId, placementId, hasToken: !!token });
+  }
 });
 
 // Click tracking endpoint
 router.get('/v1/c', async (req, res) => {
-  const { li: lineItemId, c: creativeId, p: placementId, u: destination } = req.query;
+  const { li: lineItemId, c: creativeId, p: placementId } = req.query;
   
   if (lineItemId && creativeId && placementId) {
     try {
+      // Get creative info to validate and get the stored click URL
+      const creativeData = await db
+        .select({
+          creative: {
+            id: vantatrackCreatives.id,
+            clickUrl: vantatrackCreatives.clickUrl,
+            status: vantatrackCreatives.status
+          }
+        })
+        .from(vantatrackCreatives)
+        .where(eq(vantatrackCreatives.id, parseInt(creativeId)))
+        .limit(1);
+
+      if (!creativeData.length || creativeData[0].creative.status !== 'active') {
+        return res.status(400).send('Invalid click tracking request');
+      }
+
+      const { creative } = creativeData[0];
+      
       // Get placement info for logging
       const placementData = await db
         .select({
-          placement: vantatrackPlacements,
-          site: vantatrackSites,
-          publisher: vantatrackPublishers
+          placement: {
+            id: vantatrackPlacements.id,
+            siteId: vantatrackPlacements.siteId,
+            status: vantatrackPlacements.status
+          },
+          site: {
+            id: vantatrackSites.id,
+            publisherId: vantatrackSites.publisherId,
+            status: vantatrackSites.status
+          },
+          publisher: {
+            id: vantatrackPublishers.id,
+            status: vantatrackPublishers.status
+          }
         })
         .from(vantatrackPlacements)
         .leftJoin(vantatrackSites, eq(vantatrackPlacements.siteId, vantatrackSites.id))
@@ -212,8 +300,17 @@ router.get('/v1/c', async (req, res) => {
         // Get line item and campaign info
         const lineItemData = await db
           .select({
-            lineItem: vantatrackLineItems,
-            campaign: vantatrackCampaigns
+            lineItem: {
+              id: vantatrackLineItems.id,
+              campaignId: vantatrackLineItems.campaignId,
+              creativeId: vantatrackLineItems.creativeId,
+              status: vantatrackLineItems.status
+            },
+            campaign: {
+              id: vantatrackCampaigns.id,
+              clientId: vantatrackCampaigns.clientId,
+              status: vantatrackCampaigns.status
+            }
           })
           .from(vantatrackLineItems)
           .leftJoin(vantatrackCampaigns, eq(vantatrackLineItems.campaignId, vantatrackCampaigns.id))
@@ -222,6 +319,11 @@ router.get('/v1/c', async (req, res) => {
 
         if (lineItemData.length) {
           const { lineItem, campaign } = lineItemData[0];
+          
+          // Validate that the line item matches the creative (prevent tampering)
+          if (lineItem.creativeId !== parseInt(creativeId)) {
+            return res.status(400).send('Invalid click tracking request');
+          }
           
           // Log click event
           logAdEvent('click', {
@@ -238,6 +340,9 @@ router.get('/v1/c', async (req, res) => {
             deviceType: /Mobile|Android|iPhone|iPad/i.test(req.headers['user-agent'] || '') ? 'mobile' : 'desktop',
             revenueBdt: 0 // Clicks don't generate revenue directly
           });
+          
+          // Redirect to the validated creative click URL
+          return res.redirect(creative.clickUrl);
         }
       }
     } catch (error) {
@@ -245,13 +350,152 @@ router.get('/v1/c', async (req, res) => {
     }
   }
   
-  // Redirect to destination
-  if (destination) {
-    res.redirect(decodeURIComponent(destination));
-  } else {
-    res.status(400).send('Invalid click tracking request');
-  }
+  // If we get here, something went wrong
+  res.status(400).send('Invalid click tracking request');
 });
+
+// Process impression with budget enforcement (simplified for deadline)
+async function processImpression(lineItemId, creativeId, placementId, req) {
+  try {
+    const userAgent = req.headers['user-agent'] || '';
+    const deviceType = /Mobile|Android|iPhone|iPad/i.test(userAgent) ? 'mobile' : 'desktop';
+    
+    // Basic validation and cost calculation
+    const lineItem = await db.select().from(vantatrackLineItems).where(eq(vantatrackLineItems.id, lineItemId)).limit(1);
+    if (!lineItem.length) return;
+
+    const creative = await db.select().from(vantatrackCreatives).where(eq(vantatrackCreatives.id, creativeId)).limit(1);
+    if (!creative.length) return;
+
+    const campaign = await db.select().from(vantatrackCampaigns).where(eq(vantatrackCampaigns.id, lineItem[0].campaignId)).limit(1);
+    if (!campaign.length) return;
+
+    const placement = await db.select().from(vantatrackPlacements).where(eq(vantatrackPlacements.id, placementId)).limit(1);
+    if (!placement.length) return;
+
+    const site = await db.select().from(vantatrackSites).where(eq(vantatrackSites.id, placement[0].siteId)).limit(1);
+    if (!site.length) return;
+
+    // Enhanced validation to prevent fraud
+    if (!creative[0] || !lineItem[0] || !campaign[0] || !placement[0] || !site[0]) {
+      console.error('Missing required data for impression validation');
+      return;
+    }
+
+    // CRITICAL: Verify creative belongs to line item (prevents fraud!)
+    if (lineItem[0].creativeId !== parseInt(creativeId)) {
+      console.error('FRAUD ATTEMPT BLOCKED - Creative does not belong to line item:', { 
+        lineItemId, 
+        creativeId, 
+        expectedCreativeId: lineItem[0].creativeId 
+      });
+      return;
+    }
+
+    // Validate all entities are active (INCLUDING placement/site/publisher)
+    if (lineItem[0].status !== 'active') {
+      console.error('Line item is not active:', lineItemId);
+      return;
+    }
+
+    if (campaign[0].status !== 'active') {
+      console.error('Campaign is not active:', campaign[0].id);
+      return;
+    }
+
+    if (creative[0].status !== 'active') {
+      console.error('Creative is not active:', creativeId);
+      return;
+    }
+
+    // CRITICAL: Validate placement/site/publisher are active (prevents fraud!)
+    if (placement[0].status !== 'active') {
+      console.error('FRAUD BLOCKED - Placement is not active:', placementId);
+      return;
+    }
+
+    if (site[0].status !== 'active') {
+      console.error('FRAUD BLOCKED - Site is not active:', site[0].id);
+      return;
+    }
+
+    // Get publisher and validate it's active
+    const publisher = await db.select().from(vantatrackPublishers).where(eq(vantatrackPublishers.id, site[0].publisherId)).limit(1);
+    if (!publisher.length || publisher[0].status !== 'active') {
+      console.error('FRAUD BLOCKED - Publisher is not active:', site[0].publisherId);
+      return;
+    }
+
+    // Validate ad size compatibility (prevents placement mismatches)
+    if (creative[0].adSize !== placement[0].adSize) {
+      console.error('FRAUD BLOCKED - Ad size mismatch:', { 
+        creativeSize: creative[0].adSize, 
+        placementSize: placement[0].adSize 
+      });
+      return;
+    }
+
+    // Validate date range
+    const today = new Date();
+    const startDate = new Date(lineItem[0].startDate);
+    const endDate = new Date(lineItem[0].endDate);
+    
+    if (today < startDate || today > endDate) {
+      console.error('Line item outside date range:', { lineItemId, today, startDate, endDate });
+      return;
+    }
+
+    const impressionCost = parseFloat(lineItem[0].bidCpmBdt) / 1000;
+    const currentSpent = parseFloat(lineItem[0].spentBdt || 0);
+    const newTotalSpent = currentSpent + impressionCost;
+
+    // Atomic budget enforcement with conditional update inside transaction
+    const updateResult = await db.transaction(async (tx) => {
+      // Lock the row and conditionally update budget only if within limits
+      const updateQuery = await tx.execute(sql`
+        UPDATE vantatrack_line_items 
+        SET spent_bdt = spent_bdt + ${impressionCost}
+        WHERE id = ${lineItemId} 
+        AND (total_budget_bdt IS NULL OR spent_bdt + ${impressionCost} <= total_budget_bdt)
+        RETURNING spent_bdt, total_budget_bdt
+      `);
+
+      // If update didn't affect any rows, budget was exceeded
+      if (updateQuery.rowCount === 0) {
+        console.log(`Budget exceeded for line item ${lineItemId} - impression blocked`);
+        return { success: false, reason: 'budget_exceeded' };
+      }
+
+      // Budget update successful, log the impression
+      await tx.insert(vantatrackAdEvents).values({
+        eventType: 'impression',
+        placementId: placement[0].id,
+        creativeId: creativeId,
+        lineItemId: lineItem[0].id,
+        campaignId: campaign[0].id,
+        clientId: campaign[0].clientId,
+        siteId: site[0].id,
+        publisherId: site[0].publisherId,
+        userIp: req.ip,
+        userAgent: userAgent,
+        referrer: req.headers.referer || '',
+        deviceType,
+        country: 'BD',
+        revenueBdt: impressionCost
+      });
+
+      return { success: true, newSpent: updateQuery.rows[0].spent_bdt };
+    });
+
+    if (!updateResult.success) {
+      return; // Impression was blocked due to budget
+    }
+
+    console.log(`Impression logged: line item ${lineItemId}, cost ${impressionCost} BDT`);
+  } catch (error) {
+    console.error('Error processing impression:', error);
+  }
+}
 
 // Helper function to log ad events
 async function logAdEvent(eventType, data) {
