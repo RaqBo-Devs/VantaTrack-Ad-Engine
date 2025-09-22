@@ -20,6 +20,8 @@ router.get('/v1/tag.js', async (req, res) => {
   res.setHeader('Cache-Control', 'public, max-age=3600'); // Cache for 1 hour
   res.setHeader('Access-Control-Allow-Origin', '*');
   
+
+  
   // Import fs and path for ES modules
   const { readFileSync } = await import('fs');
   const { join, dirname } = await import('path');
@@ -49,9 +51,23 @@ router.get('/v1/serve', async (req, res) => {
     // Get placement details with site and publisher info
     const placementData = await db
       .select({
-        placement: vantatrackPlacements,
-        site: vantatrackSites,
-        publisher: vantatrackPublishers
+        placement: {
+          id: vantatrackPlacements.id,
+          siteId: vantatrackPlacements.siteId,
+          adSize: vantatrackPlacements.adSize,
+          floorPriceBdt: vantatrackPlacements.floorPriceBdt,
+          placementKey: vantatrackPlacements.placementKey,
+          status: vantatrackPlacements.status
+        },
+        site: {
+          id: vantatrackSites.id,
+          publisherId: vantatrackSites.publisherId,
+          status: vantatrackSites.status
+        },
+        publisher: {
+          id: vantatrackPublishers.id,
+          status: vantatrackPublishers.status
+        }
       })
       .from(vantatrackPlacements)
       .leftJoin(vantatrackSites, eq(vantatrackPlacements.siteId, vantatrackSites.id))

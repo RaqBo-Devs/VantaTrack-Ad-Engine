@@ -114,7 +114,7 @@ app.use('/api/admin', requireAuth, adminRouter);
 app.use('/api/invite', inviteRouter);
 
 // Ad serving engine routes (public, no auth required)
-app.use('/ad', adServingRouter);
+app.use('/api/ad-serving', adServingRouter);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
