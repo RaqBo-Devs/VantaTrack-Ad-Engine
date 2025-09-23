@@ -21,6 +21,11 @@ export default defineConfig({
         target: 'http://localhost:5000',
         changeOrigin: true,
       },
+      '/ad': {
+        target: 'http://localhost:5000/api/ad-serving',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/ad/, ''),
+      },
     },
   },
   build: {

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VantaTrack Integration Test - EXACT USER CODE</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin: 20px 0;
+        }
+        #vanta-ad-daily-star-header-728x90 {
+            border: 2px dashed #059669;
+            min-height: 90px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f9f9f9;
+        }
+        h1 { color: #1e40af; }
+        .status { color: #059669; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>🇧🇩 VantaTrack Integration Test</h1>
+    
+    <div class="test-container">
+        <h2>📍 YOUR EXACT INTEGRATION CODE:</h2>
+        <div class="status">✅ Using your exact placement and script tags</div>
+        
+        <!-- YOUR EXACT INTEGRATION CODE -->
+        <div id="vanta-ad-daily-star-header-728x90" data-vanta-placement="daily-star-header-728x90"></div>
+        
+        <script src="https://83471d25-57ac-47fb-b16f-927ed28131e6-00-32qud8oohjwcs.sisko.replit.dev:3000/ad/v1/tag.js"></script>
+        
+        <script>
+        VantaAdTag.init('daily-star-header-728x90', 'vanta-ad-daily-star-header-728x90');
+        </script>
+        <!-- END EXACT INTEGRATION CODE -->
+    </div>
+
+    <div class="test-container">
+        <h3>🔍 What Should Happen:</h3>
+        <ul>
+            <li>✅ JavaScript loads from port 3000 (fixed!)</li>
+            <li>✅ Ad content appears in the dashed box above</li>
+            <li>✅ Impression gets tracked automatically</li>
+            <li>✅ Budget decreases by 0.05 BDT per view</li>
+        </ul>
+    </div>
+
+    <script>
+        // Debug logging
+        console.log('=== VantaTrack Integration Test ===');
+        
+        // Check if VantaAdTag loaded
+        setTimeout(function() {
+            if (typeof VantaAdTag !== 'undefined') {
+                console.log('✅ VantaAdTag loaded successfully');
+                console.log('VantaAdTag version:', VantaAdTag.version);
+            } else {
+                console.error('❌ VantaAdTag failed to load');
+            }
+        }, 2000);
+        
+        // Check if ad loaded
+        setTimeout(function() {
+            var adContainer = document.getElementById('vanta-ad-daily-star-header-728x90');
+            if (adContainer && adContainer.children.length > 0) {
+                console.log('✅ Ad loaded successfully');
+            } else {
+                console.error('❌ Ad failed to load in container');
+            }
+        }, 5000);
+    </script>
+</body>
+</html>
