@@ -17,6 +17,10 @@
       iframe.style.overflow = 'hidden';
       iframe.style.width = '728px';
       iframe.style.height = '90px';
+      iframe.style.minWidth = '728px';
+      iframe.style.minHeight = '90px';
+      iframe.style.maxWidth = '728px';
+      iframe.style.maxHeight = '90px';
       iframe.setAttribute('frameborder', '0');
       iframe.setAttribute('scrolling', 'no');
       iframe.setAttribute('data-placement', placementKey);
