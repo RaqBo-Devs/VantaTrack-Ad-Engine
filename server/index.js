@@ -96,6 +96,9 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Static file serving for banner images and assets (public access)
+app.use('/attached_assets', express.static(join(__dirname, '../attached_assets')));
+
 // Ad serving engine routes (public, no auth required, no rate limiting for high volume)
 app.use('/api/ad-serving', adServingRouter);
 
