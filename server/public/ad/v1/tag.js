@@ -34,7 +34,13 @@
         '&viewport=' + encodeURIComponent(window.innerWidth + 'x' + window.innerHeight);
       
       iframe.src = adUrl;
+      
+      // Clear loading message and show iframe
+      container.innerHTML = '';
       container.appendChild(iframe);
+      
+      // Set initial height while loading
+      iframe.style.height = '90px';
       
       // Listen for resize messages from ad content
       window.addEventListener('message', function(event) {

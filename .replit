@@ -42,7 +42,8 @@ outputType = "console"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "JWT_SECRET=\"VantaTrack2025SecureJWTSecretForBangladeshAdEngine!\" npm run server"
+args = "JWT_SECRET=\"VantaTrack2025SecureJWTSecretForBangladeshAdEngine!\" PORT=3000 npm run server"
+waitForPort = 3000
 
 [[workflows.workflow]]
 name = "VantaTrack Frontend"
@@ -58,7 +59,3 @@ outputType = "console"
 [[ports]]
 localPort = 3000
 externalPort = 3000
-
-[[ports]]
-localPort = 5000
-externalPort = 80
