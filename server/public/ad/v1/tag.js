@@ -7,7 +7,7 @@
     // Configuration
     config: {
       baseUrl: window.location.protocol + '//' + window.location.host,
-      endpoint: '/ad/v1/serve'
+      endpoint: '/api/ad-serving/v1/serve'
     },
 
     // Create iframe for ad placement
