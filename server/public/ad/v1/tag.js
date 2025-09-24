@@ -15,8 +15,8 @@
       var iframe = document.createElement('iframe');
       iframe.style.border = 'none';
       iframe.style.overflow = 'hidden';
-      iframe.style.width = '100%';
-      iframe.style.height = '0px';
+      iframe.style.width = '728px';
+      iframe.style.height = '90px';
       iframe.setAttribute('frameborder', '0');
       iframe.setAttribute('scrolling', 'no');
       iframe.setAttribute('data-placement', placementKey);
@@ -39,8 +39,7 @@
       container.innerHTML = '';
       container.appendChild(iframe);
       
-      // Set initial height while loading
-      iframe.style.height = '90px';
+      // Dimensions already set above
       
       // Listen for resize messages from ad content
       window.addEventListener('message', function(event) {
